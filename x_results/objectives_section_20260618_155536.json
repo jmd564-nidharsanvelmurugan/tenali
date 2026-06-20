@@ -1,0 +1,15 @@
+{
+    "section": "Objectives",
+    "timestamp": "20260618_155536",
+    "retrieval_query": "unified L2A CAC data model automated reporting scalable Power BI dashboards",
+    "chunks_used": 9,
+    "document_ids": [
+        "PROP_20260615_125925_A5D918",
+        "PROP_20260615_130616_B3B1EF",
+        "PROP_20260615_141424_DAF85A",
+        "PROP_20260615_141210_E40BD0",
+        "PROP_20260615_140924_204B74",
+        "PROP_20260615_141604_23C03A"
+    ],
+    "content": "# Objectives\n\n- Establish a comprehensive Lead-to-AUM (L2A) and Customer Acquisition Cost (CAC) data model that delivers granular visibility into the full client acquisition journey.  \n- Provide leadership with actionable insights into pipeline performance and marketing ROI through enhanced Power BI reporting.  \n- Automate data ingestion, transformation, and reporting refresh processes to ensure accuracy, timeliness, and consistency of insights.  \n- Improve user experience with intuitive dashboards, standardized KPI definitions, and clear visualizations supporting data-driven decision-making.  \n- Build a scalable reporting foundation capable of integrating additional data sources and supporting future growth in data maturity."
+}

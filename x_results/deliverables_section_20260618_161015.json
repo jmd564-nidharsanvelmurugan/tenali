@@ -1,0 +1,15 @@
+{
+    "section": "Deliverables",
+    "timestamp": "20260618_161015",
+    "retrieval_query": "KPI Book Power BI mock-ups data model gap assessment implementation roadmap",
+    "chunks_used": 10,
+    "document_ids": [
+        "PROP_20260615_125925_A5D918",
+        "PROP_20260615_130616_B3B1EF",
+        "PROP_20260615_141424_DAF85A",
+        "PROP_20260615_141210_E40BD0",
+        "PROP_20260615_140924_204B74",
+        "PROP_20260615_141604_23C03A"
+    ],
+    "content": "# Deliverables\n\nThroughout the engagement with Pure Financial Advisors LLC, the following key deliverables and artifacts will be provided to ensure a comprehensive and actionable outcome aligned with the project objectives:\n\n1. **KPI Book**  \n- Definition and documentation of Lead-to-AUM (L2A) and Customer Acquisition Cost (CAC) KPIs.  \n- Detailed calculation logic, data source mapping, and metric ownership.  \n- Alignment of KPI definitions with industry standards and Pure’s internal reporting framework.  \n\n2. **Power BI Mock-ups**  \n- Design of up to eight Power BI dashboard views focused on L2A and CAC insights.  \n- Visualization of key metrics, conversion funnels, and marketing ROI indicators.  \n- Wireframes capturing layout, navigation, and user experience requirements for leadership and marketing teams.  \n\n3. **Data Model Design**  \n- Blueprint of the enhanced L2A and CAC data model integrating Salesforce, Tamarac, Azure Blob Storage, and QuickBooks.  \n- Logical and physical data model diagrams detailing relationships, hierarchies, and data flows.  \n- Documentation of data transformation logic and schema definitions to support automated reporting.  \n\n4. **Data Gap Assessment**  \n- Identification of missing or inconsistent data elements across source systems impacting L2A and CAC reporting.  \n- Evaluation of data quality, completeness, and readiness for integration.  \n- Recommendations for remediation and data governance improvements.  \n\n5. **Technical Approach**  \n- Detailed description of the integration and automation strategy for QuickBooks and Salesforce data ingestion.  \n- Specification of batch processing pipelines within Microsoft Fabric and Azure Synapse.  \n- Outline of technical dependencies, data refresh cadence, and validation checkpoints.  \n\n6. **Phase 3B Implementation Plan**  \n- Roadmap outlining activities, milestones, and timelines for the build and deployment phase.  \n- Sequencing of tasks for data integration, model development, and Power BI report implementation.  \n- Resource plan and risk mitigation framework to ensure successful execution.  \n\nEach deliverable will be iteratively reviewed with Pure Financial Advisors LLC's leadership and technical teams to ensure alignment with business goals and to incorporate feedback promptly. This structured approach guarantees transparency, accountability, and measurable value throughout the engagement lifecycle."
+}

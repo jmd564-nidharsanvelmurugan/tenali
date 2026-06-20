@@ -1,0 +1,317 @@
+[{"category_id": 1,
+      "category_name": "Business Context",
+      "questions": [
+        {
+          "id": "1.1",
+          "question": "What is the client/company name?",
+          "answer": "PURE FINANCIAL ADVISORS LLC"
+        },
+        {
+          "id": "1.2",
+          "question": "What industry does the client operate in?",
+          "answer": "Financial advisory and wealth management"
+        },
+        {
+          "id": "1.3",
+          "question": "What are the client's primary business offerings?",
+          "answer": "Financial advisory services and asset management"
+        },
+        {
+          "id": "1.4",
+          "question": "What region/countries does the business operate in?",
+          "answer": "United States"
+        },
+        {
+          "id": "1.5",
+          "question": "Who are the key business stakeholders?",
+          "answer": "Jason Carver (Client Engagement Manager), Lee Equity Partners (investment partner)"
+        },
+        {
+          "id": "1.6",
+          "question": "What business model does the client follow?",
+          "answer": "B2C"
+        },
+        {
+          "id": "1.7",
+          "question": "What is driving this initiative/project now?",
+          "answer": "Pure is looking to develop enhanced Lead-to-AUM (L2A) pipeline and customer acquisition cost (CAC) reporting to provide more granular information about the journey from lead to AUM and return on marketing spend."
+        }
+      ]
+    },
+    {
+      "category_id": 2,
+      "category_name": "Overview",
+      "questions": [
+        {
+          "id": "2.1",
+          "question": "Which teams/processes are affected?",
+          "answer": "Data, technology, and marketing teams involved in pipeline and customer acquisition reporting."
+        },
+        {
+          "id": "2.2",
+          "question": "What systems/platforms are currently being used?",
+          "answer": "Salesforce, Tamarac, Azure Blob Storage, Microsoft Fabric, Azure Synapse, Power BI, and QuickBooks (to be integrated)."
+        },
+        {
+          "id": "2.3",
+          "question": "What reporting or analytics tools exist today?",
+          "answer": "Power BI reporting suite."
+        },
+        {
+          "id": "2.4",
+          "question": "What databases/data sources are involved?",
+          "answer": "Salesforce, Tamarac, Azure Blob Storage, and QuickBooks."
+        },
+        {
+          "id": "2.5",
+          "question": "What manual processes currently exist?",
+          "answer": "Not mentioned in document."
+        },
+        {
+          "id": "2.6",
+          "question": "What integration challenges exist today?",
+          "answer": "Need to connect and ingest data from QuickBooks and assess data quality for CAC reporting."
+        },
+        {
+          "id": "2.7",
+          "question": "Are there performance/scalability issues?",
+          "answer": "Not mentioned in document."
+        },
+        {
+          "id": "2.8",
+          "question": "What are the primary data sources?",
+          "answer": "Salesforce, Tamarac, Azure Blob Storage, and QuickBooks."
+        },
+        {
+          "id": "2.9",
+          "question": "What cloud/platform infrastructure exists?",
+          "answer": "Microsoft Fabric and Azure Synapse data platforms."
+        },
+        {
+          "id": "2.10",
+          "question": "Are there data governance policies?",
+          "answer": "Not mentioned in document."
+        }
+      ]
+    },
+    {
+      "category_id": 3,
+      "category_name": "Understanding",
+      "questions": [
+        {
+          "id": "3.1",
+          "question": "What business problem is the client trying to solve?",
+          "answer": "To enhance and improve existing pipeline reporting and develop detailed Lead-to-AUM and Customer Acquisition Cost reporting."
+        },
+        {
+          "id": "3.2",
+          "question": "What are the current pain points?",
+          "answer": "Limited granularity in existing pipeline reporting and lack of integrated CAC insights."
+        },
+        {
+          "id": "3.3",
+          "question": "What inefficiencies exist in the current process?",
+          "answer": "Not mentioned in document."
+        },
+        {
+          "id": "3.4",
+          "question": "What capabilities/features are required?",
+          "answer": "Enhanced L2A and CAC data model, Power BI reporting suite, data ingestion from QuickBooks, and data quality assessment."
+        },
+        {
+          "id": "3.5",
+          "question": "What workflows should be automated?",
+          "answer": "Automated data ingestion and transformation pipelines for L2A and CAC reporting."
+        },
+        {
+          "id": "3.6",
+          "question": "What user roles/personas will use the system?",
+          "answer": "Data and technology stakeholders, senior leadership, and marketing teams."
+        },
+        {
+          "id": "3.7",
+          "question": "What security/compliance requirements exist?",
+          "answer": "Not mentioned in document."
+        },
+        {
+          "id": "3.8",
+          "question": "What integrations are mandatory?",
+          "answer": "Integration with QuickBooks and Salesforce."
+        }
+      ]
+    },
+    {
+      "category_id": 4,
+      "category_name": "Objectives",
+      "questions": [
+        {
+          "id": "4.1",
+          "question": "What should the future-state solution achieve?",
+          "answer": "Deliver a full Lead-to-AUM and CAC data model and reporting suite providing granular insights into pipeline performance and marketing ROI."
+        },
+        {
+          "id": "4.2",
+          "question": "What processes should become automated?",
+          "answer": "Data ingestion, transformation, and reporting refresh processes."
+        },
+        {
+          "id": "4.3",
+          "question": "What insights should leadership gain?",
+          "answer": "Granular understanding of the journey from lead to AUM and return on marketing spend."
+        },
+        {
+          "id": "4.4",
+          "question": "What user experience improvements are expected?",
+          "answer": "Improved Power BI dashboards with clear KPI definitions and visualizations."
+        },
+        {
+          "id": "4.5",
+          "question": "What business processes need improvement?",
+          "answer": "Pipeline reporting and customer acquisition cost tracking."
+        },
+        {
+          "id": "4.6",
+          "question": "What is the long-term vision for this solution?",
+          "answer": "To drive data maturity and scalable reporting capabilities for Pure\u2019s growth."
+        },
+        {
+          "id": "4.7",
+          "question": "What scalability requirements exist?",
+          "answer": "The data platform and reporting should be scalable to support future data sources and reporting needs."
+        },
+        {
+          "id": "4.8",
+          "question": "What systems should the future platform integrate with?",
+          "answer": "Salesforce, QuickBooks, Tamarac, and Azure Fabric."
+        },
+        {
+          "id": "4.9",
+          "question": "What business decisions should AI support?",
+          "answer": "Not mentioned in document."
+        }
+      ]
+    },
+    {
+      "category_id": 5,
+      "category_name": "Deliverables",
+      "questions": [
+        {
+          "id": "5.1",
+          "question": "What deliverables are expected from discovery?",
+          "answer": "KPI Book, Power BI mock-ups, Data Model design, Data Gap Assessment, Technical Approach, and Phase 3B Implementation Plan."
+        },
+        {
+          "id": "5.2",
+          "question": "Should the engagement include solution architecture?",
+          "answer": "Yes, the data model design and technical approach are part of the deliverables."
+        },
+        {
+          "id": "5.3",
+          "question": "Should wireframes/mockups be created?",
+          "answer": "Yes, Power BI mock-ups limited to 8 views will be created."
+        },
+        {
+          "id": "5.4",
+          "question": "Should a roadmap/phased plan be prepared?",
+          "answer": "Yes, a Phase 3B Implementation Plan will be prepared."
+        },
+        {
+          "id": "5.5",
+          "question": "Is a POC/MVP expected?",
+          "answer": "Not explicitly mentioned, but the Design phase outputs serve as a foundation for the Build phase."
+        },
+        {
+          "id": "5.6",
+          "question": "What level of technical detail is expected in the proposal?",
+          "answer": "Detailed data model, KPI logic, reporting requirements, and technical approach for QuickBooks integration."
+        }
+      ]
+    },
+    {
+      "category_id": 6,
+      "category_name": "Approach",
+      "questions": [
+        {
+          "id": "6.1",
+          "question": "Is real-time or batch processing required?",
+          "answer": "Batch processing through automated pipelines in the Fabric data platform."
+        },
+        {
+          "id": "6.2",
+          "question": "Are APIs available for integrations?",
+          "answer": "Not mentioned in document."
+        },
+        {
+          "id": "6.3",
+          "question": "What reports/dashboards are needed?",
+          "answer": "8-page Power BI report focused on L2A and CAC reporting."
+        },
+        {
+          "id": "6.4",
+          "question": "Are approval workflows required?",
+          "answer": "Not mentioned in document."
+        },
+        {
+          "id": "6.5",
+          "question": "What alerts/notifications are required?",
+          "answer": "Not mentioned in document."
+        },
+        {
+          "id": "6.6",
+          "question": "What constraints, timelines, or dependencies must be considered?",
+          "answer": "Phase 3A is 3 weeks; Phase 3B is 8\u201312 weeks; dependent on QuickBooks ingestion and data quality assessment."
+        },
+        {
+          "id": "6.7",
+          "question": "What is in scope for this engagement?",
+          "answer": "Design and build of L2A and CAC data model, reporting suite, and QuickBooks integration."
+        },
+        {
+          "id": "6.8",
+          "question": "What is out of scope?",
+          "answer": "Connections to systems other than Salesforce and QuickBooks, existing report migrations, enhancements to previous reporting deliverables, and platform architecture changes."
+        }
+      ]
+    },
+    {
+      "category_id": 7,
+      "category_name": "Outcomes",
+      "questions": [
+        {
+          "id": "7.1",
+          "question": "What are the expected business outcomes?",
+          "answer": "Enhanced L2A and CAC reporting providing actionable insights into pipeline performance and marketing ROI."
+        },
+        {
+          "id": "7.2",
+          "question": "What KPIs or success metrics matter most?",
+          "answer": "Lead-to-AUM conversion metrics and Customer Acquisition Cost KPIs."
+        },
+        {
+          "id": "7.3",
+          "question": "What risks exist if this problem is not solved?",
+          "answer": "Limited visibility into marketing effectiveness and pipeline performance."
+        },
+        {
+          "id": "7.4",
+          "question": "What does success look like for the client?",
+          "answer": "Accurate, automated, and insightful L2A and CAC reporting integrated into Power BI."
+        },
+        {
+          "id": "7.5",
+          "question": "What constraints exist?",
+          "answer": "Data access, data quality, and dependency on QuickBooks integration."
+        },
+        {
+          "id": "7.6",
+          "question": "Are there timeline expectations?",
+          "answer": "Phase 3A: 3 weeks; Phase 3B: 8\u201312 weeks."
+        },
+        {
+          "id": "7.7",
+          "question": "What dependencies exist?",
+          "answer": "Access to Salesforce, QuickBooks, and existing Fabric and Synapse data platforms."
+        }
+    ]
+}
+]

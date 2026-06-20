@@ -1,0 +1,29 @@
+{
+  "@odata.context": "https://cog-search-tenaliaiaz-prod-uksouth.search.windows.net/$metadata#indexers/$entity",
+  "@odata.etag": "\"0x8DE2F1564AFED4A\"",
+  "name": "tenaliaiaz-jlens-user-workspace-indexer",
+  "description": null,
+  "dataSourceName": "tenaliaiaz-jlens-user-workspace-datasource",
+  "skillsetName": "tenaliaiaz-jlens-user-workspace-skillset",
+  "targetIndexName": "tenaliaiaz-jlens-user-workspace",
+  "disabled": null,
+  "schedule": null,
+  "parameters": {
+    "batchSize": null,
+    "maxFailedItems": null,
+    "maxFailedItemsPerBatch": null,
+    "base64EncodeKeys": null,
+    "configuration": {
+      "parsingMode": "default"
+    }
+  },
+  "fieldMappings": [
+    {
+      "sourceFieldName": "metadata_storage_name",
+      "targetFieldName": "title",
+      "mappingFunction": null
+    }
+  ],
+  "outputFieldMappings": [],
+  "encryptionKey": null
+}

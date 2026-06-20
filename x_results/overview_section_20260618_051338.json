@@ -1,0 +1,15 @@
+{
+    "section": "Overview",
+    "timestamp": "20260618_051338",
+    "retrieval_query": "data technology marketing teams Salesforce Tamarac Azure Synapse Power BI QuickBooks",
+    "chunks_used": 7,
+    "document_ids": [
+        "PROP_20260615_125925_A5D918",
+        "PROP_20260615_130616_B3B1EF",
+        "PROP_20260615_141424_DAF85A",
+        "PROP_20260615_141210_E40BD0",
+        "PROP_20260615_140924_204B74",
+        "PROP_20260615_141604_23C03A"
+    ],
+    "content": "# Overview\n\nPure Financial Advisors’ current reporting environment spans multiple internal teams, primarily data, technology, and marketing, all of which contribute to pipeline and customer acquisition reporting. The firm operates on a connected data ecosystem built around Salesforce and Tamarac for client and portfolio management, Azure Blob Storage for data hosting, and Microsoft Fabric and Azure Synapse as the core data platforms. Power BI serves as the primary reporting and analytics tool, supporting existing dashboards and performance views across these systems.\n\nData sources currently include Salesforce, Tamarac, Azure Blob Storage, and QuickBooks, with the latter identified for upcoming integration. While manual processes are not specified, the environment relies on batch data movement and structured reporting refreshes. Integration challenges center on connecting and ingesting data from QuickBooks and ensuring data quality for customer acquisition cost reporting. The infrastructure is fully cloud-based within Microsoft’s ecosystem, providing a foundation for scalable data management and analytics across Pure’s operational teams."
+}

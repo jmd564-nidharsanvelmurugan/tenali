@@ -1,0 +1,70 @@
+{
+  "client_name": "Client",
+  "generated_date": "2026-06-19T16:36:53.320696",
+  "sections_completed": [
+    "Business Context",
+    "Overview",
+    "Understanding",
+    "Objectives",
+    "Deliverables",
+    "Approach",
+    "Outcomes",
+    "Business Impact",
+    "collect_sections"
+  ],
+  "total_sections": 9,
+  "total_chunks_used": 69,
+  "section_metrics": {
+    "business_context": {
+      "chunks_used": 10,
+      "has_content": true,
+      "content_length": 1460
+    },
+    "overview": {
+      "chunks_used": 7,
+      "has_content": true,
+      "content_length": 1000
+    },
+    "understanding": {
+      "chunks_used": 7,
+      "has_content": true,
+      "content_length": 1192
+    },
+    "objectives": {
+      "chunks_used": 9,
+      "has_content": true,
+      "content_length": 894
+    },
+    "deliverables": {
+      "chunks_used": 10,
+      "has_content": true,
+      "content_length": 2733
+    },
+    "approach": {
+      "chunks_used": 10,
+      "has_content": true,
+      "content_length": 3093
+    },
+    "outcomes": {
+      "chunks_used": 7,
+      "has_content": true,
+      "content_length": 1888
+    },
+    "business_impact": {
+      "chunks_used": 9,
+      "has_content": true,
+      "content_length": 1717
+    }
+  },
+  "metadata": {
+    "business_offering": "Financial Services",
+    "solution": "Core Reporting",
+    "region": "US",
+    "project_type": "Both",
+    "commercial_use_case": "Pipeline",
+    "technical_use_case": "Data Platform",
+    "business_model": "B2C",
+    "existing_infra": "Yes",
+    "pe_relationship": "PE Portco"
+  }
+}

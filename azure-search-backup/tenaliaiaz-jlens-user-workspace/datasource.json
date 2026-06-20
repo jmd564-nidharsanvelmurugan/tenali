@@ -1,0 +1,22 @@
+{
+  "@odata.context": "https://cog-search-tenaliaiaz-prod-uksouth.search.windows.net/$metadata#datasources/$entity",
+  "@odata.etag": "\"0x8DE2F1482A86027\"",
+  "name": "tenaliaiaz-jlens-user-workspace-datasource",
+  "description": null,
+  "type": "azureblob",
+  "subtype": null,
+  "credentials": {
+    "connectionString": null
+  },
+  "container": {
+    "name": "tenaliai-jlens-user-workspace",
+    "query": null
+  },
+  "dataChangeDetectionPolicy": null,
+  "dataDeletionDetectionPolicy": {
+    "@odata.type": "#Microsoft.Azure.Search.SoftDeleteColumnDeletionDetectionPolicy",
+    "softDeleteColumnName": "soft_delete",
+    "softDeleteMarkerValue": "delete_marker"
+  },
+  "encryptionKey": null
+}

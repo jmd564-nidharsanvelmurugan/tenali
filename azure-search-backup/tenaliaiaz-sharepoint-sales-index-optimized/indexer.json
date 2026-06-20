@@ -1,0 +1,52 @@
+{
+  "@odata.context": "https://cog-search-tenaliaiaz-prod-uksouth.search.windows.net/$metadata#indexers/$entity",
+  "@odata.etag": "\"0x8DE27FA192CCA10\"",
+  "name": "azureblob-sharepoint-sales-indexer",
+  "description": "",
+  "dataSourceName": "azureblob-sharepoint-sales-datasource",
+  "skillsetName": "azureblob-sharepoint-sales-skillset",
+  "targetIndexName": "azureblob-sharepoint-sales-index",
+  "disabled": null,
+  "schedule": null,
+  "parameters": {
+    "batchSize": null,
+    "maxFailedItems": 0,
+    "maxFailedItemsPerBatch": 0,
+    "base64EncodeKeys": null,
+    "configuration": {
+      "dataToExtract": "contentAndMetadata",
+      "parsingMode": "default",
+      "imageAction": "generateNormalizedImages"
+    }
+  },
+  "fieldMappings": [
+    {
+      "sourceFieldName": "metadata_storage_path",
+      "targetFieldName": "metadata_storage_path",
+      "mappingFunction": {
+        "name": "base64Encode",
+        "parameters": {
+          "useHttpServerUtilityUrlTokenEncode": false
+        }
+      }
+    }
+  ],
+  "outputFieldMappings": [
+    {
+      "sourceFieldName": "/document/merged_content",
+      "targetFieldName": "merged_content",
+      "mappingFunction": null
+    },
+    {
+      "sourceFieldName": "/document/normalized_images/*/text",
+      "targetFieldName": "text",
+      "mappingFunction": null
+    },
+    {
+      "sourceFieldName": "/document/normalized_images/*/layoutText",
+      "targetFieldName": "layoutText",
+      "mappingFunction": null
+    }
+  ],
+  "encryptionKey": null
+}

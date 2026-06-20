@@ -1,0 +1,84 @@
+{
+    "semantic_filtered": [
+        {
+            "chunk_id": "PROP_20260615_130417_E9311B_DELIVERABLES_SUB_003",
+            "subsection": "Detailed Deliverables",
+            "text": "‘Metrics that matter’ Definition & Alignment: building on the thinking Sabio have done already on important metrics and report design, we would support with definition alignment and documentation through an initial workshop at the beginning of the project to frame the data model design and focus our data assessment on the most important metrics and sources \n\nConceptual Data Model: providing a comprehensive view of all in scope data sources, including the definition of key entities, relationships, and end-to-end data flows from source systems through to final output tables. The model will be designed with scalability and flexibility in mind to support future reporting and analytics use cases. \n\nKPI Feasibility & Data Gap Assessment: a review of Sabio’s ability to report on the defined KPIs, based on the quality, completeness, and granularity of data captured in source systems. Highlights key data gaps and recommendations to address them. \n\nTech Architecture Review & Design: recommendations for a best-in-class design of future state architecture including cloud data platform, scalable pipeline design, and governance structures that future-proof reporting infrastructure. Sabio have existing Power BI reporting that is critical to operations, so JMAN will design an architecture that enables continuity or reporting without building a second source of truth. \n\nStrategic Implementation Roadmap: a clear, time-bound plan To delivery against Sabio’s reporting ambitions – from establishing best-in-class data foundations through to dashboard development and governance implementation. Considers other strategic business priorities, resourcing, scalability and potential for a future transaction timeline.",
+            "embedding_preview": "[0.03...",
+            "similarity_score": 0.7059658765792847,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_130417_E9311B_DELIVERABLES_SUB_001",
+            "subsection": "Phase 1 Deliverables",
+            "text": "Support with consolidating the definitions of the “metrics that matter” and reporting outputs that are crucial to demonstrating Sabio’s growth narratives. (Summarising, agreeing and documenting the thinking that is already in place) \n\nDesign and documentation of the versatile data models, detailing in-scope data sources (e.g., Salesforce, Sage 200 etc.,) and their end-to-end data flows from source systems to final output tables, with consideration for future reporting use cases \n\nA data gap assessment focusing on the availability, granularity, and time horizons for key KPIs and dimensions and a remediation plan for any data quality gaps, process changes or changes to system data capture that are required to build out the data cubes \n\nA comprehensive review and design and target future state data architecture that will facilitate automated and reconciled data cubes \n\nA phased delivery and implementation roadmap that outlines the short to medium term plan for investing in data and reporting across both reporting use cases (e.g. repeat revenue bridges, profitability reporting) and foundational infrastructure (e.g. data platform, governance, and processes)",
+            "embedding_preview": "[-0.0...",
+            "similarity_score": 0.6994163990020752,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_125925_A5D918_DELIVERABLES_SUB_003",
+            "subsection": "Assess Phase Deliverables",
+            "text": "Detailed root-cause diagnosis of the reconciliation gap – clearly determined and quantified drivers of reconciliation deltas for 2 prioritised entities, prioritised by impact and fixability, giving BP evidence to focus investment where it matters most\n\nComprehensive end-to-end mapping of local ERPs, FBW, FDF, BPS and Power BI for 2 priority entities, showing data sources, granularity and handoffs",
+            "embedding_preview": "[-0.0...",
+            "similarity_score": 0.6968637108802795,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_140924_204B74_DELIVERABLES_SUB_002",
+            "subsection": "Phase 2 Deliverables",
+            "text": "Outputs - Part II (Build further details on prioritised use case(s), targeting specific value levers)\n\n“Metrics that Matter” & dimension dictionary: A clearly defined list of metrics including data points required & proposed calculation methodology. This will be accompanied by the target dimensions with which Prescient wants to slice the business. The dictionary will be focused on the requirements of the priority use cases(s) identified at the end of week 2 - additional metrics beyond this will be noted down for future reference & development. \n\nDashboard mock-ups: Design of the insights & reports for the priority metrics agreed as the priority use case. These visual mock-ups will capture layout, structure, and functionality requirements and will serve as the blueprint in the implementation phase.\n\nConceptual data model: A high-level, conceptual group data model that outlines the structure and flow of data needed to deliver the agreed reporting requirements for the priority reporting use case.\n\nData gap assessment and process recommendations: High-level assessment of data availability for priority reporting, identifying gaps in coverage to conduct a feasibility assessment during roadmap prioritisation. Where data is not (or poorly) available, work with stakeholders to provide data recommendations and identify areas for process improvement to improve quality and availability over time. Recommendations will be cognisant and work alongside currently planned/ongoing data remediation efforts and will consider changes required to unlock additional or future value-add use cases, where relevant.  \n\nImplementation plan: A detailed plan outlining build phase activities, milestones, and timelines for developing the priority data assets and reports. The roadmap will be structured into prioritised, sprint-based phases to enable incremental delivery of use cases and value throughout the build. This implementation plan will include integration of go-forward systems as well as historical data.",
+            "embedding_preview": "[0.00...",
+            "similarity_score": 0.6721022725105286,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_125925_A5D918_DELIVERABLES_SUB_004",
+            "subsection": "Mapping Logic Design Deliverables",
+            "text": "Assessment of cross-system mapping processes – evaluation of current Excel/CSV processes versus programmatic alternatives (rules- or AI-based as suitable), quantifying coverage, accuracy and efficiency gains\n\nProposed target-state approach for automated mapping (PoC scope) – defining the automated logic for the two priority entities (rules- or AI-based as suitable), including required data structures, control points, and process flow",
+            "embedding_preview": "[0.01...",
+            "similarity_score": 0.6661719083786011,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_140814_C31F0E_DELIVERABLES_SUB_004",
+            "subsection": "Phase 2 Deliverables",
+            "text": "Foundational data platform: A robust, scalable data platform integrating structured data from Sage and Salesforce (and unstructured project content, to be determined by AI use case). The platform will include automated ingestion where possible and manual batch upload via templates for non-standard sources. It will be designed to support the metrics and KPIs defined for the agreed priority reporting use case and be expandable for future reporting and AI use cases. Reporting outputs: Dashboards and visualisations to deliver the agreed metrics for the agreed priority reporting use case, providing visibility on growth, project performance, and client retention. These outputs will serve as the blueprint for ongoing operational reporting and AI-enabled insights. Data quality & cleansing activities: Initial data cleansing of structured sources to ensure accuracy and usability of the priority reporting use case, including hierarchies and relationships across project, client, and contributor data. Further refinement will be implemented as the platform and reporting requirements evolve. AI POC Implementation: Delivery of fully executed proof-of-concept for the pursued AI use cases, including development, testing, and validation of the model against agreed success criteria. The POC will demonstrate practical feasibility using real data, provide measurable performance results, and establish the technical foundations required to progress into MVP development and, ultimately, a production-ready solution.",
+            "embedding_preview": "[-0.0...",
+            "similarity_score": 0.6621576547622681,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_140814_C31F0E_DELIVERABLES_SUB_003",
+            "subsection": "Enterprise-Wide AI Planning Deliverables",
+            "text": "Commercial Deliverables Enterprise AI opportunity catalogue: A structured, business-wide register of all feasible and priority AI use cases across G3, including problem statements, underlying processes, data dependencies and expected business outcomes. Cross-use-case process & workflow assessment: A consolidated view of workflows underpinning the identified opportunities, capturing decision points, manual touchpoints, bottlenecks and integration requirements that inform feasibility and design considerations. Value & feasibility evaluation pack: A quantitative and qualitative assessment of all AI use cases’ potential commercial impact (efficiency gains, cost savings, risk reduction, revenue enablement) and a feasibility rating based on data availability, system readiness, and governance maturity. Prioritisation & scoring framework: A transparent, reusable scoring model that evaluates each use case by impact, feasibility and strategic relevance. This becomes a repeatable asset for future AI prioritisation exercises. Prioritised AI use case shortlist: A ranked set of AI opportunities derived from a structured prioritisation model, highlighting which use cases represent the highest near-term value and alignment to G3’s strategic objectives. POC concepts for two priority use cases: A detailed concept design document describing the proposed POC scope, success criteria, required datasets, expected outputs, and high-level technical approach, forming the blueprint for Phase 2 delivery. AI delivery roadmap: A phased delivery roadmap outlining milestones, dependencies, and timelines required to deliver the priority near-medium term POCs and foundational enablers. This will align with the broader platform development plan and position G3 for iterative AI delivery at scale. Technical Deliverables Data & system landscape assessment: A summary of the data, systems and architecture constraints relevant to delivering the identified AI use cases, including Salesforce, Sage and unstructured sources such as proposals and project materials. This will highlight availability, quality, completeness and technical blockers. Architectural alignment note: A short technical outline describing how each prioritised use case interacts with the proposed data and AI platform, ensuring that the POC concepts are deliverable within the future-state architecture.",
+            "embedding_preview": "[0.03...",
+            "similarity_score": 0.6548840999603271,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_140814_C31F0E_DELIVERABLES_SUB_001",
+            "subsection": "Phase 1 Deliverables",
+            "text": "Commercial Deliverables Business objectives & value levers: A document articulating G3’s strategic objectives and the key performance indicators required to measure them. Metric & dimension dictionary: A clearly defined list of metrics across reporting use cases (e.g. client, project, etc.). The dictionary will also capture the dimensions important to drilling into G3’s performance (e.g. project type, project context). For the agreed priority reporting use case, detail will also be included on target calculation methodology and required data points. Reporting design and dashboard mock-ups: Design of the insights and reports for the agreed priority reporting use case (e.g. client reporting, board pack). Visual mock-ups will capture layout, structure, and functionality requirements, serving as a blueprint for the implementation phase. Delivery roadmap: A detailed plan outlining build-phase activities, milestones, and timelines for developing the foundational data platform and reporting outputs. The roadmap will be structured into prioritised, sprint-based phases to enable incremental delivery of use cases and value throughout the build. Technical Deliverables Data infrastructure and tooling recommendations: Recommendations for the foundational data platform and supporting tools required to deliver the initial reporting outputs. This will reflect JMAN’s assessment of G3’s current data environment, sources such as online systems (Sage, Salesforce), offline sources, and unstructured data (proposals, project materials, human-source interviews). Recommendations will also consider the platform’s scalability to support future growth and AI-enabled capabilities (e.g. AI-enabled automated redaction, expediting proposal/contract creation, etc.). Conceptual data model: A high-level conceptual model outlining the structure & relationships of data to support the priority reporting use case. Data assessment summary: A summary of initial observations on data availability, quality, and completeness to deliver the priority reporting use cases (e.g. Sage, Salesforce, etc.). The assessment will highlight key gaps, inform prioritisation of the build phase, and support future mitigation.",
+            "embedding_preview": "[0.02...",
+            "similarity_score": 0.6534667015075684,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_140814_C31F0E_DELIVERABLES_SUB_002",
+            "subsection": "AI Scoping Deliverables",
+            "text": "Commercial Deliverables AI use case documentation: Identify, document & prioritise AI use cases across G3. Process & workflow assessment: Targeted review of the workflow supporting the use case, highlighting manual steps, decision points and integration needs. Value & feasibility snapshot: Full assessment of expected value (efficiency, cost, risk, accuracy) and high-level feasibility based on data readiness and system constraints. POC concept: Defined POC scope, success criteria, required data, expected outputs and high-level solution approach for selected use case. We will also need to understand the GDPR compliance and how these considerations factor into the POC implementation. Technical Deliverables Data & system landscape assessment: A summary of the data, systems and architecture constraints relevant to delivering the selected AI use case, including Salesforce, Sage and unstructured sources such as proposals and project materials. This will highlight availability, quality, completeness and technical blockers. Architectural alignment note: A short technical outline describing how the prioritised use case interacts with the proposed data and AI platform, ensuring that the POC concepts are deliverable within the future-state architecture.",
+            "embedding_preview": "[0.02...",
+            "similarity_score": 0.6519124507904053,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_125925_A5D918_DELIVERABLES_SUB_002",
+            "subsection": "Understand Phase Deliverables",
+            "text": "Documentation of processes, systems and mappings – complete inventory of mapping artifacts (adjustment files, tables, code, models) with rules, rationale and risks captured for team continuity and reduced key-man risk",
+            "embedding_preview": "[0.00...",
+            "similarity_score": 0.6394306421279907,
+            "match_type": "semantic_query"
+        }
+    ]
+}

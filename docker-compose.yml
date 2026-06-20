@@ -1,0 +1,16 @@
+services:
+  backend:
+    image: crtenaliaiazdevuksouth01.azurecr.io/tenaliai-az-backend:latest
+    env_file:
+      - /home/adminuser/secrets/backend.env
+    ports:
+      - "8000:8000"
+    networks:
+      - appnet
+    command: >
+      bash -c "uvicorn main:app --host 0.0.0.0 --port 8000"
+ 
+networks:
+  appnet:
+    driver: bridge
+ 

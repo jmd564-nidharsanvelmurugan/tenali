@@ -1,0 +1,488 @@
+from sqlalchemy.orm import Session
+from uuid import UUID
+from passlib.context import CryptContext
+from . import schemas
+from db.models import UserComponentAccess, User, AIModel, Workspace, WorkspaceShare
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def get_available_components(db: Session, user_id: UUID = None):
+    """Return all available components from master tables"""
+    components = []
+    
+    # Models
+    models = db.query(AIModel).all()
+    for m in models:
+        components.append({
+            "component": m.model_id,
+            "component_type": "model",
+            "description": m.description
+        })
+    
+    # Workspaces - exclude user's own workspaces
+    workspaces_query = db.query(Workspace).join(User, Workspace.user_id == User.id)
+    if user_id:
+        workspaces_query = workspaces_query.filter(Workspace.user_id != user_id)
+    
+    workspaces = workspaces_query.all()
+    for w in workspaces:
+        components.append({
+            "component": str(w.id),
+            "component_type": "workspace",
+            "description": f"{w.name} (by {w.owner.name})",
+            "name": w.name,
+            "owner": w.owner.name
+        })
+    
+    return components
+
+def bulk_update_user_access(db: Session, user_id: UUID, updates: schemas.BulkAccessUpdate):
+    """Bulk update user access permissions"""
+    results = []
+    
+    for change in updates.access_changes:
+        if change.component_type == "workspace":
+            # Handle workspace access
+            try:
+                workspace_id = UUID(change.component)
+                workspace = db.query(Workspace).filter(Workspace.id == workspace_id).first()
+            except:
+                continue
+            
+            if not workspace:
+                continue
+            
+            if workspace.is_system_workspace:
+                # For system workspaces, create a copy for the user
+                if change.enabled:
+                    # Check if user already has a copy of this workspace
+                    existing_copy = db.query(Workspace).filter(
+                        Workspace.user_id == user_id,
+                        Workspace.name == workspace.name,
+                        Workspace.is_system_workspace == False
+                    ).first()
+                    
+                    if not existing_copy:
+                        # Create a copy for the user
+                        user_workspace = Workspace(
+                            name=workspace.name,
+                            description=workspace.description,
+                            pre_prompt=workspace.pre_prompt,
+                            is_private=workspace.is_private,
+                            is_system_workspace=False,
+                            user_id=user_id
+                        )
+                        db.add(user_workspace)
+                        results.append(f"Granted workspace: {workspace.name}")
+                    else:
+                        results.append(f"User already has workspace: {workspace.name}")
+                else:
+                    # Remove user's copy of the workspace
+                    user_copy = db.query(Workspace).filter(
+                        Workspace.user_id == user_id,
+                        Workspace.name == workspace.name,
+                        Workspace.is_system_workspace == False
+                    ).first()
+                    
+                    if user_copy:
+                        db.delete(user_copy)
+                        results.append(f"Revoked workspace: {workspace.name}")
+            else:
+                # For non-system workspaces, use WorkspaceShare with is_active flag
+                existing = db.query(WorkspaceShare).filter_by(
+                    user_id=user_id,
+                    workspace_id=workspace.id
+                ).first()
+                
+                if change.enabled:
+                    if existing:
+                        existing.is_active = True
+                        results.append(f"Granted workspace: {workspace.name}")
+                    else:
+                        from db.models import PermissionLevel
+                        new_share = WorkspaceShare(
+                            user_id=user_id,
+                            workspace_id=workspace.id,
+                            permission=PermissionLevel.read,
+                            is_active=True
+                        )
+                        db.add(new_share)
+                        results.append(f"Granted workspace: {workspace.name}")
+                else:
+                    if existing:
+                        existing.is_active = False
+                        results.append(f"Revoked workspace: {workspace.name}")
+        else:
+            # Handle features and models via UserComponentAccess
+            component_uuid = None
+            
+            if change.component_type == "model":
+                model = db.query(AIModel).filter(AIModel.model_id == change.component).first()
+                component_uuid = model.id if model else None
+            elif change.component_type == "feature":
+                feature = db.query(Feature).filter(Feature.feature_id == change.component).first()
+                component_uuid = feature.id if feature else None
+            
+            if not component_uuid:
+                continue
+            
+            existing = db.query(UserComponentAccess).filter_by(
+                user_id=user_id,
+                component_id=component_uuid,
+                component_type=change.component_type
+            ).first()
+            
+            if change.enabled and not existing:
+                new_access = UserComponentAccess(
+                    user_id=user_id,
+                    component_id=component_uuid,
+                    component_type=change.component_type
+                )
+                db.add(new_access)
+                results.append(f"Granted {change.component_type}: {change.component}")
+            elif not change.enabled and existing:
+                db.delete(existing)
+                results.append(f"Revoked {change.component_type}: {change.component}")
+    
+    db.commit()
+    return {"updated": results}
+
+def get_all_users_access(db: Session):
+    """Get all users and their access permissions"""
+    users = db.query(User).all()
+    result = []
+    
+    for user in users:
+        # Get component access (features and models)
+        access_records = db.query(UserComponentAccess).filter(UserComponentAccess.user_id == user.id).all()
+        
+        # Get workspace shares
+        workspace_shares = db.query(WorkspaceShare).join(Workspace).filter(
+            WorkspaceShare.user_id == user.id
+        ).all()
+        
+        # Get owned workspaces
+        owned_workspaces = db.query(Workspace).filter(Workspace.user_id == user.id).all()
+        
+        grouped_access = {"features": [], "models": [], "datasources": [], "workspaces": []}
+        
+        for access in access_records:
+            if access.component_type == "feature":
+                feature = db.query(Feature).filter(Feature.id == access.component_id).first()
+                if feature:
+                    grouped_access["features"].append(feature.feature_id)
+            elif access.component_type == "model":
+                model = db.query(AIModel).filter(AIModel.id == access.component_id).first()
+                if model:
+                    grouped_access["models"].append(model.model_id)
+        
+        # Add shared workspaces
+        workspace_ids = set()
+        for share in workspace_shares:
+            if share.workspace.id not in workspace_ids:
+                grouped_access["workspaces"].append({
+                    "id": str(share.workspace.id),
+                    "name": share.workspace.name,
+                    "owner": share.workspace.owner.name if share.workspace.owner else "System",
+                    "is_system_workspace": share.workspace.is_system_workspace
+                })
+                workspace_ids.add(share.workspace.id)
+        
+        # Add owned workspaces
+        for workspace in owned_workspaces:
+            if workspace.id not in workspace_ids:
+                grouped_access["workspaces"].append({
+                    "id": str(workspace.id),
+                    "name": workspace.name,
+                    "owner": user.name,
+                    "is_system_workspace": workspace.is_system_workspace
+                })
+                workspace_ids.add(workspace.id)
+        
+        result.append({
+            "user_id": str(user.id),
+            "name": user.name,
+            "email": user.email,
+            "access": grouped_access,
+            "total_access": len(access_records) + len(workspace_shares) + len(owned_workspaces)
+        })
+    
+    return result
+
+def get_limited_users_access(db: Session, current_user_id: UUID):
+    """Get current user + 5 other users for security"""
+    # Get current user first
+    current_user = db.query(User).filter(User.id == current_user_id).first()
+    
+    # Get 5 other users (excluding current user)
+    other_users = db.query(User).filter(User.id != current_user_id).limit(5).all()
+    
+    # Combine current user + 5 others
+    users = [current_user] + other_users if current_user else other_users
+    
+    result = []
+    for user in users:
+        if not user:
+            continue
+            
+        # Get component access (features and models)
+        access_records = db.query(UserComponentAccess).filter(UserComponentAccess.user_id == user.id).all()
+        
+        # Get workspace shares
+        workspace_shares = db.query(WorkspaceShare).join(Workspace).filter(
+            WorkspaceShare.user_id == user.id
+        ).all()
+        
+        # Get owned workspaces
+        owned_workspaces = db.query(Workspace).filter(Workspace.user_id == user.id).all()
+        
+        grouped_access = {"features": [], "models": [], "datasources": [], "workspaces": []}
+        
+        for access in access_records:
+            if access.component_type == "feature":
+                feature = db.query(Feature).filter(Feature.id == access.component_id).first()
+                if feature:
+                    grouped_access["features"].append(feature.feature_id)
+            elif access.component_type == "model":
+                model = db.query(AIModel).filter(AIModel.id == access.component_id).first()
+                if model:
+                    grouped_access["models"].append(model.model_id)
+        
+        # Add shared workspaces
+        workspace_ids = set()
+        for share in workspace_shares:
+            if share.workspace.id not in workspace_ids:
+                grouped_access["workspaces"].append({
+                    "id": str(share.workspace.id),
+                    "name": share.workspace.name,
+                    "owner": share.workspace.owner.name if share.workspace.owner else "System",
+                    "is_system_workspace": share.workspace.is_system_workspace
+                })
+                workspace_ids.add(share.workspace.id)
+        
+        # Add owned workspaces
+        for workspace in owned_workspaces:
+            if workspace.id not in workspace_ids:
+                grouped_access["workspaces"].append({
+                    "id": str(workspace.id),
+                    "name": workspace.name,
+                    "owner": user.name,
+                    "is_system_workspace": workspace.is_system_workspace
+                })
+                workspace_ids.add(workspace.id)
+        
+        result.append({
+            "user_id": str(user.id),
+            "name": user.name,
+            "email": user.email,
+            "access": grouped_access,
+            "total_access": len(access_records) + len(workspace_shares) + len(owned_workspaces)
+        })
+    
+    return result
+
+def search_user_by_email(db: Session, email: str):
+    """Search for a specific user by exact email match"""
+    user = db.query(User).filter(User.email == email).first()
+    
+    if not user:
+        return None
+    
+    # Get component access (features and models)
+    access_records = db.query(UserComponentAccess).filter(UserComponentAccess.user_id == user.id).all()
+    
+    # Get workspace shares
+    workspace_shares = db.query(WorkspaceShare).join(Workspace).filter(
+        WorkspaceShare.user_id == user.id
+    ).all()
+    
+    # Get owned workspaces
+    owned_workspaces = db.query(Workspace).filter(Workspace.user_id == user.id).all()
+    
+    grouped_access = {"features": [], "models": [], "datasources": [], "workspaces": []}
+    
+    for access in access_records:
+        if access.component_type == "feature":
+            feature = db.query(Feature).filter(Feature.id == access.component_id).first()
+            if feature:
+                grouped_access["features"].append(feature.feature_id)
+        elif access.component_type == "model":
+            model = db.query(AIModel).filter(AIModel.id == access.component_id).first()
+            if model:
+                grouped_access["models"].append(model.model_id)
+    
+    # Add shared workspaces
+    workspace_ids = set()
+    for share in workspace_shares:
+        if share.workspace.id not in workspace_ids:
+            grouped_access["workspaces"].append({
+                "id": str(share.workspace.id),
+                "name": share.workspace.name,
+                "owner": share.workspace.owner.name if share.workspace.owner else "System"
+            })
+            workspace_ids.add(share.workspace.id)
+    
+    # Add owned workspaces
+    for workspace in owned_workspaces:
+        if workspace.id not in workspace_ids:
+            grouped_access["workspaces"].append({
+                "id": str(workspace.id),
+                "name": workspace.name,
+                "owner": user.name
+            })
+            workspace_ids.add(workspace.id)
+    
+    return {
+        "user_id": str(user.id),
+        "name": user.name,
+        "email": user.email,
+        "access": grouped_access,
+        "total_access": len(access_records) + len(workspace_shares) + len(owned_workspaces)
+    }
+
+def suggest_users(db: Session, query: str):
+    """Get up to 3 user suggestions based on partial email or name match"""
+    if not query or len(query) < 2:
+        return []
+    
+    # Search by email or name (case-insensitive partial match)
+    users = db.query(User).filter(
+        (User.email.ilike(f"%{query}%")) | (User.name.ilike(f"%{query}%"))
+    ).limit(3).all()
+    
+    return [{"email": u.email, "name": u.name} for u in users]
+
+def admin_update_user_access(db: Session, user_email: str, updates: schemas.BulkAccessUpdate):
+    """Admin function to update any user's access"""
+    user = db.query(User).filter(User.email == user_email).first()
+    if not user:
+        raise ValueError("User not found")
+    
+    return bulk_update_user_access(db, user.id, updates)
+
+def get_user_access_by_user(db: Session, user_id: UUID):
+    # Get component access (features and models)
+    access_records = db.query(UserComponentAccess).filter_by(user_id=user_id).all()
+    
+    # Get workspace shares
+    workspace_shares = db.query(WorkspaceShare).join(Workspace).filter(
+        WorkspaceShare.user_id == user_id
+    ).all()
+    
+    # Get owned workspaces
+    owned_workspaces = db.query(Workspace).filter(Workspace.user_id == user_id).all()
+    
+    result = []
+    
+    for access in access_records:
+        component_name = None
+        
+        if access.component_type == "feature":
+            feature = db.query(Feature).filter(Feature.id == access.component_id).first()
+            component_name = feature.feature_id if feature else None
+        elif access.component_type == "model":
+            model = db.query(AIModel).filter(AIModel.id == access.component_id).first()
+            component_name = model.model_id if model else None
+        
+        if component_name:
+            access_obj = UserComponentAccess(
+                id=access.id,
+                user_id=access.user_id,
+                component_id=access.component_id,
+                component_type=access.component_type
+            )
+            access_obj.component = component_name
+            result.append(access_obj)
+    
+    # Add shared workspaces
+    workspace_ids = set()
+    for share in workspace_shares:
+        if share.workspace.id not in workspace_ids:
+            access_obj = UserComponentAccess(
+                id=share.workspace_id,
+                user_id=share.user_id,
+                component_id=share.workspace_id,
+                component_type="workspace"
+            )
+            access_obj.component = str(share.workspace.id)
+            result.append(access_obj)
+            workspace_ids.add(share.workspace.id)
+    
+    # Add owned workspaces
+    for workspace in owned_workspaces:
+        if workspace.id not in workspace_ids:
+            access_obj = UserComponentAccess(
+                id=workspace.id,
+                user_id=user_id,
+                component_id=workspace.id,
+                component_type="workspace"
+            )
+            access_obj.component = str(workspace.id)
+            result.append(access_obj)
+            workspace_ids.add(workspace.id)
+    
+    return result
+
+def create_user(db: Session, user_data: schemas.CreateUserRequest):
+    """Create a new user"""
+    # Check if user already exists
+    existing = db.query(User).filter(User.email == user_data.email).first()
+    if existing:
+        raise ValueError("User with this email already exists")
+    
+    # Hash the password
+    password_hash = pwd_context.hash(user_data.password)
+    
+    new_user = User(
+        email=user_data.email,
+        name=user_data.name,
+        password_hash=password_hash,
+        designation=user_data.designation
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    
+    return {"id": str(new_user.id), "email": new_user.email, "name": new_user.name}
+
+def create_feature(db: Session, feature_data: schemas.CreateFeatureRequest):
+    """Create a new feature"""
+    # Generate feature_id from name (lowercase, replace spaces with hyphens)
+    feature_id = feature_data.name.lower().replace(' ', '-')
+    
+    # Check if feature already exists
+    existing = db.query(Feature).filter(Feature.feature_id == feature_id).first()
+    if existing:
+        raise ValueError("Feature with this name already exists")
+    
+    new_feature = Feature(
+        feature_id=feature_id,
+        name=feature_data.name,
+        description=feature_data.description
+    )
+    db.add(new_feature)
+    db.commit()
+    db.refresh(new_feature)
+    
+    return {"id": str(new_feature.id), "feature_id": new_feature.feature_id, "name": new_feature.name}
+
+def create_model(db: Session, model_data: schemas.CreateModelRequest):
+    """Create a new AI model"""
+    # Generate model_id from name (lowercase, replace spaces with hyphens)
+    model_id = model_data.name.lower().replace(' ', '-')
+    
+    # Check if model already exists
+    existing = db.query(AIModel).filter(AIModel.model_id == model_id).first()
+    if existing:
+        raise ValueError("Model with this name already exists")
+    
+    new_model = AIModel(
+        model_id=model_id,
+        name=model_data.name,
+        description=model_data.description
+    )
+    db.add(new_model)
+    db.commit()
+    db.refresh(new_model)
+    
+    return {"id": str(new_model.id), "model_id": new_model.model_id, "name": new_model.name}

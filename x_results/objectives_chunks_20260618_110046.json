@@ -1,0 +1,76 @@
+{
+    "semantic_filtered": [
+        {
+            "chunk_id": "PROP_20260615_125925_A5D918_OBJECTIVES_SUB_002",
+            "subsection": "Immediate Objectives",
+            "text": "JMAN proposes a focused 4-week discovery phase to assess and map the end-to-end actuals landscape, quantify reconciliation drivers, and determine feasibility for automation integration that will both:\n\nServe as an operational foundation – Identify and prioritise the key drivers behind current actuals misalignment for the two pilot entities and define a sequenced roadmap for stabilisation\n\nWhere feasible, evaluate structured automation opportunities – Assess whether existing mapping logic can be formalised into rule-based processes and whether recurring exceptions can be systematically identified.",
+            "embedding_preview": "[0.04...",
+            "similarity_score": 0.6445256471633911,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_141210_E40BD0_OBJECTIVES_SUB_002",
+            "subsection": "Success Criteria",
+            "text": "Value drivers and supporting KPIs: JMAN will leverage extensive experience working with MSPs alongside Harbor IT interviews to deliver a clear set of value drivers / exit narratives, their backing KPIs and dashboard capabilities, facilitating confidence in reporting views and derivative decision making.\n\nSingle source of truth data & reporting: The data platform & reporting suite will provide a consolidated, trusted, single-source-of-truth data asset that is the foundation for data-led decision-making and board reporting. This will eliminate reliance on fragmented data sources and establish consistent KPI definitions across branches and standardized reporting workflows that provide visibility across Harbor’s entities.\n\nAbility to support M&A & quickly realize synergies from acquisitions: The data platform will be M&A-focused and include an acquisition playbook that enables rapid integration (3-4 weeks) of past acquisitions into reporting, without requiring system migrations and accommodating for varying levels of data maturity within the acquired entity. By integrating data directly into the data warehouse, reporting will no longer be dependent on system integration or manual workflows, allowing for greater visibility into subsidiary performance.\n\nSemi Real-time visibility into operations and financial performance: The platform will provide real-time visibility into operational metrics and financial performance, eliminating reliance on legacy or incomplete data sets. Trusted, self-service dashboards will enable managers to access consistent data on demand and drill into performance drivers, enabling them to independently drive operational process adherence & efficiency.\n\nGreater clarity on reporting & analytics opportunities to achieve target state and drive value creation plan: Identification of the analytics and reporting target state, assessment of data & AI use cases, and a recommended roadmap will enable the business to understand where data can be leveraged to drive the value creation plan.\n\nSupport a future transaction: The data platform and reporting suite will serve as a critical data asset for future transactions, with three-fold effects: (i) defend and support exit narratives that have been driven throughout the hold period, (ii) easily serve up data for buy- and sell-side diligence, and (iii) help present the business as a data mature company with valuable data assets.",
+            "embedding_preview": "[0.02...",
+            "similarity_score": 0.6394917368888855,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_140924_204B74_OBJECTIVES_SUB_001",
+            "subsection": "Strategic Goals",
+            "text": "JMAN will provide a roadmap and plan to build a core reporting suite. This will focus on delivering reporting for different user groups: from operational/partner-level reporting to management and board-level reporting, all the way up to investor-reporting. At time of exit, the dashboards can also support the demonstration of a compelling equity story for future investors, ensuring Prescient has one, single-source-of-truth for data and reporting. The reporting priorities and KPIs will be defined in collaboration with key Client stakeholders, absorbing existing requirements already defined and will incorporate JMAN’s recommendations from previous work building reporting for professional services businesses.",
+            "embedding_preview": "[0.02...",
+            "similarity_score": 0.6236028671264648,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_125925_A5D918_OBJECTIVES_SUB_001",
+            "subsection": "Overarching Objectives",
+            "text": "Deliver fully reconciled and trusted financial actuals – Establish a unified, transparent view of actuals across all entities to strengthen confidence in financial reporting and decision-making.\n\nHarmonise and modernise finance systems – Integrate FDF, FBW, and BPS into a consistent data and process framework that supports future modernisation, scalability, and migration readiness.\n\nStreamline and govern data and consolidation flows – Build efficient, well-governed data processes that effectively combine automation and oversight to improve consolidation speed, accuracy, and control.",
+            "embedding_preview": "[-0.0...",
+            "similarity_score": 0.6228177547454834,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_141424_DAF85A_OBJECTIVES_SUB_001",
+            "subsection": "Strategic Goals",
+            "text": "The Assessment and Design Phase will lay the foundations and design for the following end-state objectives. Ultimately, by the conclusion of the data programme as a whole, the target outcomes are: Clarity on existing data functionality and assets – Obtain a clear view of the firm’s current data capabilities, reporting outputs and systems, identifying strengths, gaps, and areas for improvement. Agreed and defined long-term KPIs and reporting framework – Establish a clearly defined set of long-term KPIs and standardised business reporting structures aligned to strategic objectives, once initial analysis is complete, consistent across the global business. Defined roadmap with clear prioritisation – Sequence data, reporting, and AI initiatives based on value, risk and feasibility to enable phased delivery and minimise disruption. Establish a single source of truth for commercial performance – Design a reporting architecture that ensures consistent definitions, and aligned data & reporting across sales, finance, and operational teams. Live, automated, and scalable reporting – Establish efficient, automated, and scalable reporting processes to provide timely and reliable views of business performance, reducing manual reporting effort. Future-proofed data infrastructure – Build infrastructure and data models that ensure scalability and ongoing reporting quality, support predictive and prescriptive analytics & AI use-cases. Exploratory and value-driven analysis – Perform exploratory analysis to answer key business questions, surface insights, and identify value creation opportunities, with a particular focus on sales performance data to drive pipeline hygiene and proactive management. Enhanced team structure and data culture – Strengthen internal ownership of data and reporting, embedding consistent processes and behaviours to maximise the value of data across the organisation. Lower data risk profile – Reduce person-dependency, manual errors, and control gaps through governed processes, auditability, and system-based reporting.",
+            "embedding_preview": "[-0.0...",
+            "similarity_score": 0.6166843771934509,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_141210_E40BD0_OBJECTIVES_SUB_001",
+            "subsection": "Strategic Goals",
+            "text": "Therefore, Harbor is seeking an experienced data partner to provide recommendations for industry best practices and support with the design & build of a scalable, single source of truth (SSOT) data platform, which consolidates accurate information across subsidiaries and provides accurate reporting & insights on business performance. Establishing this business-wide single source of truth will also serve as a data asset for future transaction, when the time comes.",
+            "embedding_preview": "[-0.0...",
+            "similarity_score": 0.5811283588409424,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_130616_B3B1EF_OBJECTIVES_SUB_001",
+            "subsection": "Strategic Goals",
+            "text": "As Saffery enters a period of exit preparation, the firm is focused on sharpening how its performance and value creation story are articulated to prospective investors. Central to this is building a clear, defensible view of customer and revenue dynamics that evidence revenue quality, client durability, margin drivers, and scalability within its partner-led model. Enhanced reporting and analytics will enable management to translate deep client relationships and sector expertise into a compelling, data-backed equity narrative ahead of exit.",
+            "embedding_preview": "[0.01...",
+            "similarity_score": 0.5685297250747681,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_141424_DAF85A_OBJECTIVES_SUB_002",
+            "subsection": "Baseline Metrics",
+            "text": "Building a lasting data asset will drive value throughout the hold and beyond by providing the management team with actionable insights to guide day-to-day operations and allow for the clear articulation of equity narratives and the growth story during a future exit transaction/event.",
+            "embedding_preview": "[0.00...",
+            "similarity_score": 0.5607450008392334,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_141604_23C03A_OBJECTIVES_SUB_001",
+            "subsection": "Objectives",
+            "text": "No content found in proposal",
+            "embedding_preview": "[0.00...",
+            "similarity_score": 0.4654792547225952,
+            "match_type": "semantic_query"
+        }
+    ]
+}

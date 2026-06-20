@@ -1,0 +1,60 @@
+{
+    "semantic_filtered": [
+        {
+            "chunk_id": "PROP_20260615_141604_23C03A_OVERVIEW_SUB_001",
+            "subsection": "Project Overview",
+            "text": "Kroll seek support in the delivery of a rapid, transaction-focused data cube and reporting solution to support a carve-out transaction process. We propose to break down the project into the following phases:",
+            "embedding_preview": "[0.02...",
+            "similarity_score": 0.6514905095100403,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_130616_B3B1EF_OVERVIEW_SUB_001",
+            "subsection": "Project Overview",
+            "text": "JMAN will provide a roadmap and plan to build a customer cube, a customer-centric multi-dimensional data model, focusing on delivering historic customer reporting for a transaction eventdifferent user groups: from operational/partner-level reporting to management and board-level reporting, all the way up to investor-reporting. The dashboards will support what is required for transaction diligence, ensuring Saffery has one, single-source-of-truth for data and reporting.  The reporting priorities and KPIs will be defined in collaboration with key Client stakeholders, absorbing existing requirements, and will incorporate JMAN’s recommendations from previous work building clientcustomer reporting for professional services businesses. \n\nOur approach will build upon these frameworks, ensuring that our data architecture and infrastructure recommendations integrate with and enhance existing platforms rather than replacing them.  \n\nOur proposal is broken into two phases. This proposal and statement of work covers the Design & Discovery Phase (outlined below). On completion of the Design & Discovery Phase, one of the deliverables will be a proposal and implementation plan for a customer cube build (Phase 2).",
+            "embedding_preview": "[-0.0...",
+            "similarity_score": 0.6468645334243774,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_140924_204B74_OVERVIEW_SUB_001",
+            "subsection": "Current Data Challenges",
+            "text": "Prescient faces several critical data challenges across customers, financials, projects, HR, and drug/asset metadata. Customer and account data suffers from duplicate child accounts, inconsistent naming, and manual entry across multiple systems, leading to mismatch between Salesforce, Kantata, and Sage Intacct. There is no single customer master, and overlap across Prescient, Uptake, and the new acquisition requires complex mapping to understand the full client relationship landscape. Project and delivery data is fragmented between Kantata and CMAP, with Kantata used primarily for financial tracking rather than operational delivery, limiting its usefulness for utilisation or performance insights.\n\nFinancial data is split across Sage Intacct, multiple Xero instances, and legacy Sage 50, with the cleanest consistent data only available from January 2023 onward due to staggered migrations. HR data is also inconsistent: Oracle has significant accuracy issues, historical role and grade structures vary across entities, and older HR systems may no longer be accessible. This complicates historical calculation across key financial and operational KPIs including margin by role, cost per FTE, and utilisation metrics. Drug and asset metadata suffers from free‑text entry in Salesforce, resulting in inconsistent or incomplete INN, brand, and code name fields. Only one of the three asset fields is mandatory, and projects covering multiple assets lack standardised allocation rules, limiting the ability to tie revenue to specific assets or phases. Patent data is not captured systemically and is currently being compiled manually for only recent revenue. Finally, reporting is heavily Excel‑driven, with no central data warehouse or unified schema, making analytics slow, manual, and highly error‑prone. Prescient management are keenly aware of their data challenges and have identified and actioned multiple workstreams focused on data remediation.",
+            "embedding_preview": "[0.00...",
+            "similarity_score": 0.6014918088912964,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_141424_DAF85A_OVERVIEW_SUB_001",
+            "subsection": "Current Systems",
+            "text": "The reporting and data landscape is highly fragmented and manual with financial and operational data spread across SAP (Financials), Salesforce (CRM & Operations), and Anaplan (top-layer reporting), with multiple legal entities.",
+            "embedding_preview": "[-0.0...",
+            "similarity_score": 0.5728675127029419,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_141424_DAF85A_OVERVIEW_SUB_002",
+            "subsection": "Affected Teams",
+            "text": "Over time, numerous operational and management reports have been created to meet specific regional or business needs. This has resulted in a fragmented reporting environment characterised by hundreds of reports, inconsistent KPI definitions, limited quality control, and frequent discrepancies between outputs, reducing management confidence in the data.",
+            "embedding_preview": "[0.00...",
+            "similarity_score": 0.561214804649353,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_125925_A5D918_OVERVIEW_SUB_001",
+            "subsection": "Overview",
+            "text": "No content found in proposal",
+            "embedding_preview": "[0.00...",
+            "similarity_score": 0.4563950002193451,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_141210_E40BD0_OVERVIEW_SUB_001",
+            "subsection": "Overview",
+            "text": "No content found in proposal",
+            "embedding_preview": "[0.00...",
+            "similarity_score": 0.4563950002193451,
+            "match_type": "semantic_query"
+        }
+    ]
+}

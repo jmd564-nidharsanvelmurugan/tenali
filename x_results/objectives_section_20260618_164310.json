@@ -1,0 +1,15 @@
+{
+    "section": "Objectives",
+    "timestamp": "20260618_164310",
+    "retrieval_query": "unified L2A data model automated CAC reporting scalable Power BI dashboards integrated QuickBooks Salesforce systems data maturity and marketing ROI insights",
+    "chunks_used": 9,
+    "document_ids": [
+        "PROP_20260615_125925_A5D918",
+        "PROP_20260615_130616_B3B1EF",
+        "PROP_20260615_141424_DAF85A",
+        "PROP_20260615_141210_E40BD0",
+        "PROP_20260615_140924_204B74",
+        "PROP_20260615_141604_23C03A"
+    ],
+    "content": "# Objectives\n\n- Establish a comprehensive Lead‑to‑AUM (L2A) and Customer Acquisition Cost (CAC) data model that delivers granular insights into pipeline performance and marketing ROI.  \n- Automate data ingestion, transformation, and reporting refresh processes to ensure consistent, timely, and accurate reporting.  \n- Provide leadership with clear visibility into the full customer journey from lead generation through AUM conversion, enabling data‑driven decision‑making.  \n- Enhance Power BI dashboards with standardized KPI definitions and intuitive visualizations to improve user experience and reporting clarity.  \n- Build a scalable data foundation capable of integrating additional data sources and supporting future growth in PURE’s reporting capabilities.  \n- Advance PURE’s overall data maturity by creating a trusted, unified reporting environment that supports strategic and operational planning."
+}

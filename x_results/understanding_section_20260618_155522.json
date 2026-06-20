@@ -1,0 +1,15 @@
+{
+    "section": "Understanding",
+    "timestamp": "20260618_155522",
+    "retrieval_query": "limited pipeline reporting granularity  \nlack of integrated customer acquisition cost insights  \nneed for enhanced L2A and CAC data model  \nrequirement for QuickBooks data integration  \nautomated data ingestion and transformation pipelines",
+    "chunks_used": 7,
+    "document_ids": [
+        "PROP_20260615_125925_A5D918",
+        "PROP_20260615_130616_B3B1EF",
+        "PROP_20260615_141424_DAF85A",
+        "PROP_20260615_141210_E40BD0",
+        "PROP_20260615_140924_204B74",
+        "PROP_20260615_141604_23C03A"
+    ],
+    "content": "# Understanding\n\n- Pure Financial Advisors seeks to address limited granularity in existing pipeline reporting and the absence of integrated Customer Acquisition Cost (CAC) insights.  \n- Current reporting does not provide a detailed view of the Lead-to-AUM (L2A) journey, limiting visibility into marketing effectiveness and conversion performance.  \n- Data ingestion from QuickBooks is not yet established, creating gaps in CAC tracking and overall data completeness.  \n- Automated data ingestion and transformation workflows are required to reduce manual effort and ensure consistent, timely reporting updates.  \n- The initiative requires development of an enhanced L2A and CAC data model to unify data across Salesforce, Tamarac, Azure, and QuickBooks.  \n- Primary users will include data and technology stakeholders, senior leadership, and marketing teams who rely on accurate pipeline and acquisition metrics.  \n- Mandatory integrations include Salesforce and QuickBooks to enable end-to-end visibility across lead generation, conversion, and cost tracking."
+}

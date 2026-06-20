@@ -1,0 +1,7 @@
+# Business Context
+
+PURE Financial Advisors LLC operates in the U.S. financial advisory and wealth management sector, providing personalized financial advisory services and asset management solutions to individual clients. The firm follows a B2C model and is supported by key stakeholders including Jason Carver, Client Engagement Manager, and Lee Equity Partners as its investment partner. PURE’s operations rely on a modern data and technology stack encompassing Salesforce, Tamarac, Azure Synapse, Microsoft Fabric, Power BI, and QuickBooks.
+
+The current initiative is driven by PURE’s need to strengthen its Lead‑to‑AUM (L2A) pipeline and Customer Acquisition Cost (CAC) reporting. Existing pipeline reports lack the granularity required to fully understand the journey from lead generation to assets under management and to measure marketing effectiveness. By integrating QuickBooks data and enhancing data quality across systems, PURE aims to deliver a unified, automated reporting framework that provides leadership with actionable insights into marketing ROI and pipeline performance.
+
+This project represents a strategic step toward data maturity and scalable reporting capabilities. The enhanced L2A and CAC data model will enable PURE to automate data ingestion and transformation processes, improve Power BI dashboards, and establish a consistent foundation for future analytics and decision‑making across its data, technology, and marketing teams.

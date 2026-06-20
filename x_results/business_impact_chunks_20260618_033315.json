@@ -1,0 +1,84 @@
+{
+    "semantic_filtered": [
+        {
+            "chunk_id": "PROP_20260615_140814_C31F0E_BUSINESS_IMPACT_SUB_001",
+            "subsection": "Benefits of Approach",
+            "text": "Phased approach – ensures the highest priority items are delivered first, focusing on the board pack first-use case and foundational metrics, while capturing requirements for broader reporting and AI capabilities. Expertise in diverse data maturity landscape – JMAN has extensive experience working with extremely acquisitive businesses, with a broad range of data maturities (e.g. Excel-based to system-based reporting). Single-Source-of-Truth data and reporting – across the complex data landscape and multiple brands, this approach leaves G3 with a granular, consolidated, single-source-of-truth data asset that is the foundation for data-led decision-making. Future-proofed platform – a data platform and reporting suite are designed to scale with G3’s growth, support AI-enabled workflows (e.g., proposal enrichment, contributor matching, business development insights), and adapt as operational requirements evolve. Specialist PE-backed experience – JMAN’s track record with private equity portfolio companies ensures G3’s data environment will be built to scale, evolve, and withstand scrutiny in future growth or exit events, including being the only provider to be named explicitly in the data category of an exit (Dains exit from Horizon in 2024).",
+            "embedding_preview": "[0.05...",
+            "similarity_score": 0.5971806049346924,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_130616_B3B1EF_BUSINESS_IMPACT_SUB_001",
+            "subsection": "Operational KPIs",
+            "text": "Service Provider Professional Services Expertise – extensive experience building data platforms for acquisitive, PE-backed professional services and accountancy businesses. \n\nM&A Platform – final deliverables of a Build phase leave Saffery with a data and reporting suite that allows rapid integration (3-4 weeks) of a new acquisition into reporting, without requiring system migrations. \n\nLasting Data Asset – a data platform and reporting suite is a lasting data asset for Saffery, this serves as a foundation for M&A and insights/reporting, ensuring Saffery is a mature, data-driven management team. \n\nSingle-Source-of-Truth Data & Reporting – across the complex data landscape and multiple brands, this approach leaves Saffery with a consolidated, trusted, single-source-of-truth data asset that is the foundation for data-led decision-making. \n\nLeveraged for a Future Transaction – a data platform and reporting suite can serve as a data asset for future transactions, with two-fold effects: (i) easily serve up data for buy- and sell-side diligence, (ii) helps present the business as a data mature company with valuable data assets. \n\nExpertise in Diverse Data Maturity Landscape – JMAN has extensive experience working with extremely acquisitive businesses, with a broad range of data maturities (e.g. Excel-based to system-based reporting).",
+            "embedding_preview": "[4.42...",
+            "similarity_score": 0.5961754322052002,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_140924_204B74_BUSINESS_IMPACT_SUB_001",
+            "subsection": "Operational KPIs",
+            "text": "Service Provider Professional Services Expertise – extensive experience building data platforms for PE-backed professional services businesses, including Pharmaceuticals, across multiple industries and geographies. Our work with similar businesses enables tailored insights on organic revenue growth, quality of earnings, customer acquisition costs, product profitability and service line profitability, all critical to Prescient's growth.\n\nM&A Platform – final deliverables of a Build phase provide Prescient with a data and reporting suite for rapid data integration playbook for new acquisitions without immediate system migrations. This supports Prescient's strategy of 2-3 add-on acquisitions annually and ensures consistent reporting despite potential legacy system differences.\n\nLasting Data Asset – a data platform and reporting suite is a lasting data asset for Prescient, this serves as a foundation for M&A and insights/reporting, ensuring Prescient is a mature, data-driven management team.\n\nSingle-Source-of-Truth Data & Reporting – across the complex data landscape and multiple entities, this approach leaves Prescient with a consolidated, trusted, single-source-of-truth data asset that is the foundation for data-led decision-making.\n\nLeveraged for a Future Transaction – a data platform and reporting suite can serve as a data asset for future transactions, with two-fold effects: (i) easily serve up data for buy- and sell-side diligence, (ii) helps present the business as a data mature company with valuable data assets.\n\nExpertise in Diverse Data Maturity Landscape – JMAN has extensive experience working with extremely acquisitive businesses, with a broad range of data maturities (e.g. Excel-based to system-based reporting) and challenges in cross-system reconciliation.",
+            "embedding_preview": "[-0.0...",
+            "similarity_score": 0.5899031758308411,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_141604_23C03A_BUSINESS_IMPACT_SUB_001",
+            "subsection": "Fees and Payment",
+            "text": "Total Charges:\n\n$27,740 (+VAT) Weekly Run Rate\n\nOpportunity to review team and scale team/rate after Phase 1 to meet priority outputs",
+            "embedding_preview": "[-0.0...",
+            "similarity_score": 0.5776541829109192,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_130417_E9311B_BUSINESS_IMPACT_SUB_001",
+            "subsection": "Operational KPIs",
+            "text": "Single-Source-of-Truth (SSOT) Data & Reporting – across the complex data landscape and multiple systems, this approach leaves Sabio with a consolidated, trusted, single-source-of-truth data asset that is the foundation for a successful transaction process and data-led decision-making, including the housing of key business logic and data governance practices, which enable consistent reporting and alignment across the business.",
+            "embedding_preview": "[-0.0...",
+            "similarity_score": 0.5660191178321838,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_130417_E9311B_BUSINESS_IMPACT_SUB_003",
+            "subsection": "Service Provider Expertise",
+            "text": "Service Provider Expertise – extensive experience building data cubes for acquisitive, PE-backed businesses to support transaction processes.   \n\nExpertise in Diverse Data Maturity Landscape – JMAN has extensive experience working with acquisitive businesses, with a broad range of data maturities (e.g. Excel-based to system-based reporting).",
+            "embedding_preview": "[0.03...",
+            "similarity_score": 0.5640000104904175,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_130417_E9311B_BUSINESS_IMPACT_SUB_002",
+            "subsection": "Risk Reduction",
+            "text": "De-risked Transaction Execution – SSOT enables consistency across all bidder-facing figures and can be easily updated throughout the process as needed. This eliminates the data preparation concerns for the management team, allowing them to focus on executing the transaction.",
+            "embedding_preview": "[-0.0...",
+            "similarity_score": 0.5610268712043762,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_125925_A5D918_BUSINESS_IMPACT_SUB_003",
+            "subsection": "Risk Reduction",
+            "text": "Out of Scope\n\nAny complete or fully operationalised data mapping\n\nAny optimisation to existing systems or implementation of new Solution identified part of this phase\n\nAny work outside of the chosen 2 priority entities\n\nAny additional entities must be captured by a Change Order as set out in Schedule 1 to the MSA.\n\nAssumptions\n\nAny relevant data extracts where possible provided ahead of project kick-off including information about relevant FP&A processes and related excel tools\n\nAccess to systems and software as required for the work on this project\n\nTime and input provided by the relevant stakeholders as per 3.2, with key meetings diarized prior to project kick off\n\nAny delay for required access or data extracts may result in a billable timeline extension",
+            "embedding_preview": "[-0.0...",
+            "similarity_score": 0.526718020439148,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_125925_A5D918_BUSINESS_IMPACT_SUB_001",
+            "subsection": "Financial ROI",
+            "text": "Weekly Run Rate:\n\nGBP 31,765 per week (+ VAT)\n\nTotal Project Price\n\nGBP 127,060 (+ VAT)\n\nTerms\n\nAny expenses incurred will be agreed with the Client before and charged at cost",
+            "embedding_preview": "[0.00...",
+            "similarity_score": 0.509484052658081,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_141604_23C03A_BUSINESS_IMPACT_SUB_002",
+            "subsection": "Contacts and Administrative Details",
+            "text": "Client Engagement Manager:\n\nDavid Blowers: david.blowers@kroll.com\n\nService Provider Engagement Manager:\n\nJamie Campbell jamiecampbell@jmangroup.com\n\nSubsequent Tasks\n\nAny subsequent tasks must be captured by a Change Order as set out in Schedule 1 to the Agreement.\n\nThis SOW has been entered into by the parties on the Effective Date:\n\n....................................\n\nSigned by David Blowers for and on behalf of the Client.\n\n....................................\n\nSigned by Richard Cowen for and on behalf of the Service Provider.",
+            "embedding_preview": "[-0.0...",
+            "similarity_score": 0.44496950507164,
+            "match_type": "semantic_query"
+        }
+    ]
+}

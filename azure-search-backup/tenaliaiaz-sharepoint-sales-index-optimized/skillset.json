@@ -1,0 +1,49 @@
+{
+  "@odata.context": "https://cog-search-tenaliaiaz-prod-uksouth.search.windows.net/$metadata#skillsets/$entity",
+  "@odata.etag": "\"0x8DE27FA19268F84\"",
+  "name": "azureblob-sharepoint-sales-skillset",
+  "description": "Skillset created from the portal. skillsetName: azureblob-sharepoint-sales-skillset; contentField: merged_content; enrichmentGranularity: document; knowledgeStoreStorageAccount: ;",
+  "skills": [
+    {
+      "@odata.type": "#Microsoft.Skills.Text.MergeSkill",
+      "name": "#1",
+      "description": null,
+      "context": "/document",
+      "insertPreTag": " ",
+      "insertPostTag": " ",
+      "inputs": [
+        {
+          "name": "text",
+          "source": "/document/content",
+          "sourceContext": null,
+          "inputs": []
+        },
+        {
+          "name": "itemsToInsert",
+          "source": "/document/normalized_images/*/text",
+          "sourceContext": null,
+          "inputs": []
+        },
+        {
+          "name": "offsets",
+          "source": "/document/normalized_images/*/contentOffset",
+          "sourceContext": null,
+          "inputs": []
+        }
+      ],
+      "outputs": [
+        {
+          "name": "mergedText",
+          "targetName": "merged_content"
+        }
+      ]
+    }
+  ],
+  "cognitiveServices": {
+    "@odata.type": "#Microsoft.Azure.Search.CognitiveServicesByKey",
+    "description": "/subscriptions/7a36f602-0997-4b47-8be2-c759d6067bfa/resourceGroups/rg-tenaliaiaz-prod-uksouth-01/providers/Microsoft.CognitiveServices/accounts/cog-services-tenaliaiaz-prod-uksouth",
+    "key": "<redacted>"
+  },
+  "knowledgeStore": null,
+  "encryptionKey": null
+}

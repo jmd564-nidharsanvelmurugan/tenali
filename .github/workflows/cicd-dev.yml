@@ -1,0 +1,109 @@
+name: Build and Deploy Tenali-AI-AZ
+
+on:
+  push:
+    branches:
+      - dev
+env:
+  CONTAINER_REGISTRY: ${{ secrets.ACR_DEV_URL }}
+  BACKEND_IMAGE_NAME: tenaliai-az-backend
+  DOCKER_COMPOSE_FILE: docker-compose.yml
+
+jobs:
+  build:
+    name: Build and Push Images
+    runs-on: [self-hosted, linux, x64, dev]
+
+    
+    steps:
+      - name: Clean workspace and pyc files
+        run: |
+          echo "Fixing permissions manually..."
+          sudo chown -R $(whoami) .
+          find . -type f -name "*.pyc" -exec rm -f {} +
+          
+      - name: Cleanup Docker resources and cache
+        run: |
+          echo "Cleaning up unused Docker resources and build cache..."
+          docker system prune -af --volumes
+          docker builder prune -af
+          
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Azure Container Registry
+        run: |
+          echo "Logging into ACR manually..."
+          echo "${{ secrets.ACR_DEV_PASSWORD }}" | docker login ${{ env.CONTAINER_REGISTRY }} -u "${{ secrets.ACR_DEV_USERNAME }}" --password-stdin
+
+      - name: Build Docker Images
+        run: |
+          echo "Building backend image..."
+          docker build -t ${{ env.CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.run_number }} -f Dockerfile .
+      - name: Push Images to ACR
+        run: |
+          docker push ${{ env.CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.run_number }}
+
+
+  deploy:
+    name: Deploy to VM
+    runs-on: [self-hosted, linux, x64, dev]
+    needs: build
+    if: success()
+    environment: development
+    
+    steps:
+    
+      - name: Clean workspace and pyc files
+        run: |
+          echo "Fixing permissions manually..."
+          sudo chown -R $(whoami) .
+          find . -type f -name "*.pyc" -exec rm -f {} +
+          
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to ACR on VM
+        run: |
+          echo "${{ secrets.ACR_DEV_PASSWORD }}" | docker login ${{ env.CONTAINER_REGISTRY }} -u "${{ secrets.ACR_DEV_USERNAME }}" --password-stdin
+
+      - name: Prepare Deployment
+        run: |
+          echo "Saving current images..."
+          mkdir -p ~/deployment-state
+          docker images --format "{{.Repository}}:{{.Tag}}" | grep "${{ env.CONTAINER_REGISTRY }}" > ~/deployment-state/previous.txt
+
+          echo "Updating docker-compose file with new images..."
+          sed -i "s|image:.*|image: ${{ env.CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.run_number }}|" ${{ env.DOCKER_COMPOSE_FILE }}
+
+      - name: Start New Deployment
+        run: |
+          echo "Deploying new containers..."
+          docker compose -f ${{ env.DOCKER_COMPOSE_FILE }} down || true
+          docker compose -f ${{ env.DOCKER_COMPOSE_FILE }} pull
+          docker compose -f ${{ env.DOCKER_COMPOSE_FILE }} up -d
+
+      - name: Smoke Test
+        id: smoke_test
+        run: |
+          echo "Waiting 15s for containers to start..."
+          sleep 15
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/health || echo "000")
+          echo "HTTP Status: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "Smoke test failed with status $HTTP_STATUS"
+            exit 1
+          fi
+          echo "Smoke test passed"
+
+      - name: Rollback on Failure
+        if: failure() && steps.smoke_test.outcome == 'failure'
+        run: |
+          echo "Rolling back to previous image..."
+          PREVIOUS_IMAGE=$(cat ~/deployment-state/previous.txt | head -1)
+          echo "Previous image: $PREVIOUS_IMAGE"
+          sed -i "s|image:.*|image: $PREVIOUS_IMAGE|" ${{ env.DOCKER_COMPOSE_FILE }}
+          docker compose -f ${{ env.DOCKER_COMPOSE_FILE }} down || true
+          docker compose -f ${{ env.DOCKER_COMPOSE_FILE }} pull
+          docker compose -f ${{ env.DOCKER_COMPOSE_FILE }} up -d
+          echo "Rollback complete"

@@ -1,0 +1,76 @@
+{
+    "semantic_filtered": [
+        {
+            "chunk_id": "PROP_20260615_141424_DAF85A_BUSINESS_IMPACT_SUB_001",
+            "subsection": "Operational KPIs",
+            "text": "Benefits of Approach: Plan for Improved Data Accuracy – The feasibility assessment, plan for historical clean up and go-forward recommendations will lay out a clear path to improved ability for accurately reporting the metrics that matter. Standardisation – By aligning on a company-wide definitions for the metrics that matter, it eliminates inconsistencies across departments and regions, ensuring a unified understanding of key metrics across the business. Mid-hold exit readiness assessment – The plan ensures that there is a credible diligence-grade data asset supporting the metrics that matter and identifies the target data state needed which will stand up in an eventual transaction event. Scalability and Long-Term Sustainability – Reporting asset outlined in the plan will serve as a lasting asset for future continuous and accurate management level reporting for the management team to run the business and support ongoing value creation.",
+            "embedding_preview": "[0.00...",
+            "similarity_score": 0.6615927815437317,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_141210_E40BD0_BUSINESS_IMPACT_SUB_001",
+            "subsection": "Operational KPIs",
+            "text": "Benefits of Approach\n\nSingle-Source-of-Truth – A consolidated, trusted, single-source-of-truth data asset across the business that tracks performance against the value creation plan in real-time, setting the foundation for data-led decision making at Harbor.\n\nM&A Platform – The data and reporting suite will allow rapid integration (3-4 weeks) of pre-acquisition data into reporting without system migration dependences.\n\nFinancial Data Platform & Reporting Suite Aligned to Value Levers – Metrics & Data Platform will enable visibility into industry standard F&A KPIs, informing operational reporting suite tied to value drivers\n\nManagement & Operator Engagement: Operators & management are brought along the journey through defining KPIs and testing intermediate outputs, ensuring they understand, trust, and actively use the reporting platform and know how to leverage the reporting suite to drive operational performance.\n\nLasting Data Asset – A data platform and reporting suite is a lasting data asset for the business. It will serve as a foundation for M&A, reporting and advanced analytics. This will pave the way for a mature, data-oriented management team to drive strategic decisions.\n\nLeveraged for a Future Transaction – A data platform and reporting suite will support and smoothen the next transaction process.\n\nCapability Transfer – Enabled by development of a clear plan during design for how the assets developed will be used, maintained & governed going forwards, including upskilling of existing technical resources, a plan to roll out data assets to key users, and support with potential new hires (if this is required). If internal capacity to manage the platform does not exist, JMAN offers a managed service team at a cost effective monthly run rate to maintain and refresh the reporting platform.\n\nJMAN’s Services Expertise – Extensive experience building data platforms for acquisitive MSPs, providing best-in-class recommendations on KPIs and data architecture to ensure scalability and maintainability of data platform.",
+            "embedding_preview": "[0.01...",
+            "similarity_score": 0.6182751059532166,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_141604_23C03A_BUSINESS_IMPACT_SUB_001",
+            "subsection": "Fees and Payment",
+            "text": "Total Charges:\n\n$27,740 (+VAT) Weekly Run Rate\n\nOpportunity to review team and scale team/rate after Phase 1 to meet priority outputs",
+            "embedding_preview": "[-0.0...",
+            "similarity_score": 0.5755086541175842,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_130616_B3B1EF_BUSINESS_IMPACT_SUB_001",
+            "subsection": "Operational KPIs",
+            "text": "Service Provider Professional Services Expertise – extensive experience building data platforms for acquisitive, PE-backed professional services and accountancy businesses. \n\nM&A Platform – final deliverables of a Build phase leave Saffery with a data and reporting suite that allows rapid integration (3-4 weeks) of a new acquisition into reporting, without requiring system migrations. \n\nLasting Data Asset – a data platform and reporting suite is a lasting data asset for Saffery, this serves as a foundation for M&A and insights/reporting, ensuring Saffery is a mature, data-driven management team. \n\nSingle-Source-of-Truth Data & Reporting – across the complex data landscape and multiple brands, this approach leaves Saffery with a consolidated, trusted, single-source-of-truth data asset that is the foundation for data-led decision-making. \n\nLeveraged for a Future Transaction – a data platform and reporting suite can serve as a data asset for future transactions, with two-fold effects: (i) easily serve up data for buy- and sell-side diligence, (ii) helps present the business as a data mature company with valuable data assets. \n\nExpertise in Diverse Data Maturity Landscape – JMAN has extensive experience working with extremely acquisitive businesses, with a broad range of data maturities (e.g. Excel-based to system-based reporting).",
+            "embedding_preview": "[4.42...",
+            "similarity_score": 0.5703262090682983,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_140924_204B74_BUSINESS_IMPACT_SUB_001",
+            "subsection": "Operational KPIs",
+            "text": "Service Provider Professional Services Expertise – extensive experience building data platforms for PE-backed professional services businesses, including Pharmaceuticals, across multiple industries and geographies. Our work with similar businesses enables tailored insights on organic revenue growth, quality of earnings, customer acquisition costs, product profitability and service line profitability, all critical to Prescient's growth.\n\nM&A Platform – final deliverables of a Build phase provide Prescient with a data and reporting suite for rapid data integration playbook for new acquisitions without immediate system migrations. This supports Prescient's strategy of 2-3 add-on acquisitions annually and ensures consistent reporting despite potential legacy system differences.\n\nLasting Data Asset – a data platform and reporting suite is a lasting data asset for Prescient, this serves as a foundation for M&A and insights/reporting, ensuring Prescient is a mature, data-driven management team.\n\nSingle-Source-of-Truth Data & Reporting – across the complex data landscape and multiple entities, this approach leaves Prescient with a consolidated, trusted, single-source-of-truth data asset that is the foundation for data-led decision-making.\n\nLeveraged for a Future Transaction – a data platform and reporting suite can serve as a data asset for future transactions, with two-fold effects: (i) easily serve up data for buy- and sell-side diligence, (ii) helps present the business as a data mature company with valuable data assets.\n\nExpertise in Diverse Data Maturity Landscape – JMAN has extensive experience working with extremely acquisitive businesses, with a broad range of data maturities (e.g. Excel-based to system-based reporting) and challenges in cross-system reconciliation.",
+            "embedding_preview": "[-0.0...",
+            "similarity_score": 0.5468525886535645,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_125925_A5D918_BUSINESS_IMPACT_SUB_003",
+            "subsection": "Risk Reduction",
+            "text": "Out of Scope\n\nAny complete or fully operationalised data mapping\n\nAny optimisation to existing systems or implementation of new Solution identified part of this phase\n\nAny work outside of the chosen 2 priority entities\n\nAny additional entities must be captured by a Change Order as set out in Schedule 1 to the MSA.\n\nAssumptions\n\nAny relevant data extracts where possible provided ahead of project kick-off including information about relevant FP&A processes and related excel tools\n\nAccess to systems and software as required for the work on this project\n\nTime and input provided by the relevant stakeholders as per 3.2, with key meetings diarized prior to project kick off\n\nAny delay for required access or data extracts may result in a billable timeline extension",
+            "embedding_preview": "[-0.0...",
+            "similarity_score": 0.5359992980957031,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_141604_23C03A_BUSINESS_IMPACT_SUB_002",
+            "subsection": "Contacts and Administrative Details",
+            "text": "Client Engagement Manager:\n\nDavid Blowers: david.blowers@kroll.com\n\nService Provider Engagement Manager:\n\nJamie Campbell jamiecampbell@jmangroup.com\n\nSubsequent Tasks\n\nAny subsequent tasks must be captured by a Change Order as set out in Schedule 1 to the Agreement.\n\nThis SOW has been entered into by the parties on the Effective Date:\n\n....................................\n\nSigned by David Blowers for and on behalf of the Client.\n\n....................................\n\nSigned by Richard Cowen for and on behalf of the Service Provider.",
+            "embedding_preview": "[-0.0...",
+            "similarity_score": 0.5261131525039673,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_125925_A5D918_BUSINESS_IMPACT_SUB_001",
+            "subsection": "Financial ROI",
+            "text": "Weekly Run Rate:\n\nGBP 31,765 per week (+ VAT)\n\nTotal Project Price\n\nGBP 127,060 (+ VAT)\n\nTerms\n\nAny expenses incurred will be agreed with the Client before and charged at cost",
+            "embedding_preview": "[0.00...",
+            "similarity_score": 0.47368818521499634,
+            "match_type": "semantic_query"
+        },
+        {
+            "chunk_id": "PROP_20260615_125925_A5D918_BUSINESS_IMPACT_SUB_002",
+            "subsection": "Operational KPIs",
+            "text": "As outlined above, this project will last 4-weeks for the initial Discovery Phase.",
+            "embedding_preview": "[0.02...",
+            "similarity_score": 0.39519333839416504,
+            "match_type": "semantic_query"
+        }
+    ]
+}
