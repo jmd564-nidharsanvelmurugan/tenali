@@ -1,6 +1,6 @@
 {
   "client_name": "Client",
-  "generated_date": "2026-06-19T16:36:53.320696",
+  "generated_date": "2026-06-21T00:57:58.252304",
   "sections_completed": [
     "Business Context",
     "Overview",
@@ -13,58 +13,48 @@
     "collect_sections"
   ],
   "total_sections": 9,
-  "total_chunks_used": 69,
+  "total_chunks_used": 0,
   "section_metrics": {
     "business_context": {
-      "chunks_used": 10,
+      "chunks_used": 0,
       "has_content": true,
-      "content_length": 1460
+      "content_length": 1637
     },
     "overview": {
-      "chunks_used": 7,
+      "chunks_used": 0,
       "has_content": true,
       "content_length": 1000
     },
     "understanding": {
-      "chunks_used": 7,
+      "chunks_used": 0,
       "has_content": true,
-      "content_length": 1192
+      "content_length": 1611
     },
     "objectives": {
-      "chunks_used": 9,
+      "chunks_used": 0,
       "has_content": true,
-      "content_length": 894
+      "content_length": 1218
     },
     "deliverables": {
-      "chunks_used": 10,
+      "chunks_used": 0,
       "has_content": true,
-      "content_length": 2733
+      "content_length": 2412
     },
     "approach": {
-      "chunks_used": 10,
+      "chunks_used": 0,
       "has_content": true,
-      "content_length": 3093
+      "content_length": 3028
     },
     "outcomes": {
-      "chunks_used": 7,
+      "chunks_used": 0,
       "has_content": true,
-      "content_length": 1888
+      "content_length": 2279
     },
     "business_impact": {
-      "chunks_used": 9,
+      "chunks_used": 0,
       "has_content": true,
-      "content_length": 1717
+      "content_length": 2512
     }
   },
-  "metadata": {
-    "business_offering": "Financial Services",
-    "solution": "Core Reporting",
-    "region": "US",
-    "project_type": "Both",
-    "commercial_use_case": "Pipeline",
-    "technical_use_case": "Data Platform",
-    "business_model": "B2C",
-    "existing_infra": "Yes",
-    "pe_relationship": "PE Portco"
-  }
+  "metadata": null
 }
