@@ -8,7 +8,7 @@ from typing import Optional
 load_dotenv()
 
 # Azure AI Foundry Configuration
-AZURE_ENDPOINT = os.getenv("AZURE_ENDPOINT_PROPOSAL", "https://aif-tenaliaiaz-dev-eastus-02.services.ai.azure.com/api/projects/aif-tenaliaiaz-dev-eastus-02")
+AZURE_ENDPOINT = os.getenv("AZURE_ENDPOINT_PROPOSAL")
 AZURE_API_KEY = os.getenv("AZURE_API_KEY_PROPOSAL")  # ✅ Your API Key
 AGENT_NAME = os.getenv("AZURE_AGENT_PROPOSAL", "ai-proposal-langgraph-agent")
 AGENT_VERSION = os.getenv("AGENT_VERSION", "1")
