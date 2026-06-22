@@ -96,6 +96,7 @@ Format the response in well-structured markdown.
     # Get response from Azure AI Agent (automatically fetches from AI Search)
     content = get_agent_response(prompt, system_prompt)
     return content
+    
 
 
 # =====================================================

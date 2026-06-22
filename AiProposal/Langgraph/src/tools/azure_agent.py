@@ -100,4 +100,4 @@ if __name__ == "__main__":
         print(f"\n✅ Response: {response}")
         print("\n✅ Connection successful!")
     except Exception as e:
-        print(f"\n❌ Test failed: {e}")
+        print(f"\n❌ Test failed: {e}") 
