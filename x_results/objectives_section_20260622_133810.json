@@ -1,0 +1,6 @@
+{
+    "section": "Objectives",
+    "timestamp": "20260622_133810",
+    "source": "Azure AI Agent",
+    "content": "# Objectives\n\n- Deliver comprehensive Lead-to-AUM and Customer Acquisition Cost (CAC) data models and a reporting suite that provide granular insights into pipeline performance and marketing return on investment (ROI).\n- Automate data ingestion, transformation, and reporting refresh processes to ensure timely and accurate reporting.\n- Enable leadership to gain a clear and actionable understanding of the customer journey from lead to asset under management and the effectiveness of marketing spend.\n- Enhance the user experience by improving Power BI dashboards with intuitive visualizations and clearly defined key performance indicators (KPIs).\n- Strengthen pipeline reporting and customer acquisition cost tracking to support informed decision-making and business growth.\n- Establish a scalable data and reporting platform that can accommodate future data sources and evolving business requirements.\n- Integrate seamlessly with Salesforce, QuickBooks, Tamarac, Microsoft Fabric, and Azure Synapse to unify all relevant data within the reporting framework."
+}

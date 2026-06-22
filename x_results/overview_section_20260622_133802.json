@@ -1,0 +1,6 @@
+{
+    "section": "Overview",
+    "timestamp": "20260622_133802",
+    "source": "Azure AI Agent",
+    "content": "# Overview\n\nThe data, technology, and marketing teams at PURE FINANCIAL ADVISORS LLC are actively engaged in pipeline and customer acquisition reporting, working collaboratively across multiple functions. Central to current operations are several integrated systems and platforms: Salesforce and Tamarac for client and portfolio management, Azure Blob Storage for data retention, and Microsoft Fabric and Azure Synapse for data processing and analytics infrastructure. QuickBooks is also present within the data ecosystem and is earmarked for integration to support financial tracking and reporting workflows.\n\nPower BI serves as the primary reporting and analytics tool, offering visualization and dashboarding capabilities based on data sourced from Salesforce, Tamarac, Azure Blob Storage, and QuickBooks. The cloud and platform infrastructure is anchored by Microsoft Fabric alongside Azure Synapse, supporting batch processing pipelines. Existing operations include a need to connect data from QuickBooks and assess data quality for Customer Acquisition Cost reporting, highlighting current integration challenges. No manual processes were indicated in the questionnaire, nor were data governance policies or performance issues mentioned."
+}
