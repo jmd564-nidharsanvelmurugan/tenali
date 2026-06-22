@@ -280,31 +280,71 @@ async def read_uploaded_sales_call_questions_docx(user_id: UUID, conversation_id
         return ""
 
 
+def build_questionnaire_from_db_messages(
+    conversation_id: UUID,
+    db: Session,
+    proposal_questions: list,
+) -> str:
+    """
+    Build a questionnaire string from the QA messages stored in the DB.
 
+    Messages are stored in pairs: assistant (question text) then user (answer).
+    We match each assistant message against the known ProposalQuestions to produce
+    a clean "Q: ... / A: ..." formatted string that the langgraph agent can use.
 
+    Returns an empty string if no QA pairs are found (e.g. questions were all skipped).
+    """
+    messages = (
+        db.query(Message)
+        .filter(Message.conversation_id == conversation_id)
+        .order_by(asc(Message.created_at))
+        .all()
+    )
 
+    if not messages:
+        return ""
 
+    # Build a lookup: question text -> question object
+    question_text_map = {q.question: q for q in proposal_questions}
 
+    qa_pairs = []
+    i = 0
+    while i < len(messages) - 1:
+        q_msg = messages[i]
+        a_msg = messages[i + 1]
 
+        if q_msg.role == "assistant" and a_msg.role == "user":
+            # Only include if this assistant message is a known proposal question
+            if q_msg.content in question_text_map:
+                answer = a_msg.content.strip()
+                if answer:  # skip questions the user left blank
+                    qa_pairs.append(
+                        f"Q: {q_msg.content}\nA: {answer}"
+                    )
+                i += 2
+                continue
+        i += 1
 
+    if not qa_pairs:
+        return ""
 
-
-
-
-
-
-
-
-
-
-
-
-
+    return "\n\n".join(qa_pairs)
 
 
 async def generate_proposal(conversation_id: UUID, db: Session, uid: UUID, user_prompt: str = None):
     """
-    Generate a proposal based on user prompt and sales call questionnaire
+    Generate a proposal based on user prompt and client context.
+
+    Two mutually exclusive input paths:
+      - DOCX path:  user uploaded an answered sales call questionnaire (.docx).
+                    `client_context_qas` will be the full extracted text from that file.
+                    `questionnaire_from_db` will be "" (not sent to agent).
+      - QA path:    user answered questions through the UI (stored as DB messages).
+                    `questionnaire_from_db` will be the formatted Q&A string.
+                    `client_context_qas` will be "" (not sent to agent).
+
+    Exactly one of the two will be non-empty. The langgraph agent receives whichever
+    one has content via the `questionnaire` parameter.
     """
     # 1. Get current user
     current_user = db.query(User).filter_by(id=uid).first()
@@ -316,27 +356,41 @@ async def generate_proposal(conversation_id: UUID, db: Session, uid: UUID, user_
     print(f"Conversation ID: {conversation_id}")
     print(f"User ID: {uid}")
     print("=" * 100)
-    
-    # 2. RETRIEVE USER PROMPT FROM DATABASE (if not provided)
-    
-    
-    # 3. RETRIEVE SALES CALL QUESTIONNAIRE FROM BLOB STORAGE
+
+    # 2. Try to read the uploaded sales call DOCX from blob storage
     client_context_qas = await read_uploaded_sales_call_questions_docx(uid, conversation_id)
-    
-    # 4. Call generate_proposal_langgraph() with both inputs
+
+    if client_context_qas:
+        # ── DOCX PATH ──────────────────────────────────────────────────────────
+        # User uploaded the answered questionnaire as a .docx file.
+        # Send its full text to the agent; ignore any DB QA messages.
+        questionnaire_for_agent = client_context_qas
+        print("generate_proposal: using DOCX upload as questionnaire source")
+    else:
+        # ── QA PATH ────────────────────────────────────────────────────────────
+        # User answered questions through the UI. Reconstruct the questionnaire
+        # string from the DB message pairs (assistant question / user answer).
+        proposal_questions = db.query(ProposalQuestions).order_by(asc(ProposalQuestions.id)).all()
+        questionnaire_for_agent = build_questionnaire_from_db_messages(
+            conversation_id, db, proposal_questions
+        )
+        print("generate_proposal: using DB QA messages as questionnaire source")
+        print(f"generate_proposal: questionnaire_for_agent (first 300 chars): {questionnaire_for_agent[:300]}")
+
+    # 3. Call generate_proposal_langgraph() with the resolved questionnaire + user prompt
     ggg_output = generate_proposal_langgraph(
-        questionnaire=client_context_qas, 
-        user_prompt=user_prompt
+        questionnaire=questionnaire_for_agent,
+        user_prompt=user_prompt or "",
     )
     
     print("Received output from generate_proposal_langgraph:")
     print(ggg_output)
     
-    # 5. GET DATA FROM ggg_output
+    # 4. GET DATA FROM ggg_output
     proposal_text = ggg_output.get("proposal_text", "")
     sections = ggg_output.get("sections", [])
     
-    # ✅ Get citations as a list
+    # Get citations as a list
     citations_data = ggg_output.get("citations", {})
     if isinstance(citations_data, dict) and "citations" in citations_data:
         citations_list = citations_data["citations"]
@@ -345,11 +399,10 @@ async def generate_proposal(conversation_id: UUID, db: Session, uid: UUID, user_
     else:
         citations_list = []
     
-    # Ensure citations is a list
     if not isinstance(citations_list, list):
         citations_list = []
     
-    # 6. Store generated proposal to DB
+    # 5. Store generated proposal to DB
     first_message = (
         db.execute(
             select(Message)
@@ -402,7 +455,7 @@ async def generate_proposal(conversation_id: UUID, db: Session, uid: UUID, user_
     db.add(reference_proposals)
     db.commit()
     
-    # 7. Upload proposal to blob storage
+    # 6. Upload proposal to blob storage
     try:
         proposal_docx_upload(proposal_text, current_user.email, conversation_id)
         print(f"Successfully uploaded proposal to blob storage")
@@ -413,7 +466,7 @@ async def generate_proposal(conversation_id: UUID, db: Session, uid: UUID, user_
     print("Proposal generation and storage completed successfully.")
     print("*" * 100)
     
-    # 8. FORMAT SECTIONS FOR FRONTEND
+    # 7. FORMAT SECTIONS FOR FRONTEND
     formatted_sections = []
     
     if sections and len(sections) > 0:
@@ -439,7 +492,7 @@ async def generate_proposal(conversation_id: UUID, db: Session, uid: UUID, user_
             "error": None
         }]
     
-    # 9. ✅ RETURN RESPONSE - citations as dict matching CitationsSchema
+    # 8. RETURN RESPONSE - citations as dict matching CitationsSchema
     return {
         "msg_id": new_message.id,
         "proposal": formatted_sections,
@@ -453,28 +506,6 @@ async def generate_proposal(conversation_id: UUID, db: Session, uid: UUID, user_
             ]
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 def edit_answers(request: EditAnswersRequest, db: Session):
@@ -502,12 +533,6 @@ def edit_answers(request: EditAnswersRequest, db: Session):
 
 async def follow_up_proposal_service(conversation_id: UUID, recent_message: str, new_message: str, db: Session, current_user: User):
     
-    # workspace_name = (
-    #     db.query(Workspace.name)
-    #     .join(Conversation, Workspace.id == Conversation.workspace_id)
-    #     .filter(Conversation.id == conversation_id)
-    #     .scalar()
-    # )
     system_prompt="""Update the entire proposal that is provided based on the new instruction provided.
 Give the full updated proposal. Don't add anything other than updated proposal in the response
 STRICTLY generate the proposal content in a WELL-STRUCTURED MARKDOWN FORMAT, use h1 heading style for section headings, h2, h3 for appropriate sub-headings, ul for bullet points and ol for numbered lists.
@@ -529,7 +554,6 @@ Adhere to the user and system instructions as well.
         print(llm_response) 
 
         assistant_content = llm_response["choices"][0]["message"]["content"]
-        # tool_content = llm_response["choices"][0]["messages"][0]["content"]
         tool_content = json.dumps({
             "citations": []
         })
@@ -625,14 +649,14 @@ def add_content_to_doc(doc, content):
             doc.add_paragraph(element.get_text(), style="Heading 3")
         elif element.name == "ul":
             for li in element.find_all("li"):
-                p = doc.add_paragraph()  # No specific style applied
-                p.add_run("• ").bold = False  # Add bullet point manually
+                p = doc.add_paragraph()
+                p.add_run("• ").bold = False
                 p.add_run(li.get_text())
         elif element.name == "ol":
             counter = 1
             for li in element.find_all("li"):
-                p = doc.add_paragraph()  # No specific style applied
-                p.add_run(f"{counter}. ").bold = False  # Add numbered point manually
+                p = doc.add_paragraph()
+                p.add_run(f"{counter}. ").bold = False
                 p.add_run(li.get_text())
                 counter += 1
         elif element.name == "p":
@@ -644,27 +668,14 @@ def add_content_to_doc(doc, content):
             p = doc.add_paragraph()
             p.add_run(element.get_text()).italic = True
         elif element.name == "code":
-            # For inline code or code blocks
-            p = doc.add_paragraph(style="Quote")  # You can choose another style like "Code"
-            p.add_run(element.get_text()).font.name = "Courier New"  # Use monospace font for code
+            p = doc.add_paragraph(style="Quote")
+            p.add_run(element.get_text()).font.name = "Courier New"
         elif element.name == "br":
-            # Handle line breaks
             doc.add_paragraph("")
     
-    # Ensure proper formatting (e.g., spacing between paragraphs)
     for paragraph in doc.paragraphs:
         paragraph.paragraph_format.space_after = Pt(6)
         paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.LEFT
-
-
-
-
-
-
-
-
-
-
 
 
 def proposal_docx(conversation_id: UUID, db: Session):
@@ -886,7 +897,7 @@ def proposal_docx(conversation_id: UUID, db: Session):
         # Styled content parsing and application
         # =====================================================
         _BOLD_RE = re.compile(r"\*\*(.+?)\*\*")
-        _SECTION_DIVIDER_RE = re.compile(r"^---\s*$|^___\s*$|^\*\*\*\s*$")  # Matches ---, ___, ***
+        _SECTION_DIVIDER_RE = re.compile(r"^---\s*$|^___\s*$|^\*\*\*\s*$")
 
         def _add_inline_runs(p, text, size_pt, color, bold=False, italic=False):
             pos = 0
@@ -965,14 +976,12 @@ def proposal_docx(conversation_id: UUID, db: Session):
                     i += 1
                     continue
 
-                # Check for section divider markers (---, ___, ***)
                 if _SECTION_DIVIDER_RE.match(stripped):
                     _pink_divider(doc)
                     section_count += 1
                     i += 1
                     continue
 
-                # Check for table
                 if stripped.startswith("|") and i + 1 < n and re.match(r"^\|?[\s:|-]+\|?$", lines[i + 1].strip()):
                     header_cells = [c.strip() for c in stripped.strip("|").split("|")]
                     j = i + 2
@@ -985,9 +994,7 @@ def proposal_docx(conversation_id: UUID, db: Session):
                     i = j
                     continue
 
-                # Check for heading level 1
                 if stripped.startswith("# "):
-                    # Add pink divider before major headings (except the first one)
                     if heading_counter[0] > 0:
                         _pink_divider(doc)
                     
@@ -1008,7 +1015,6 @@ def proposal_docx(conversation_id: UUID, db: Session):
                     i += 1
                     continue
 
-                # Check for heading level 2
                 if stripped.startswith("## "):
                     text = stripped[3:].strip()
                     p = doc.add_paragraph()
@@ -1018,7 +1024,6 @@ def proposal_docx(conversation_id: UUID, db: Session):
                     i += 1
                     continue
 
-                # Check for bullet points
                 if stripped.startswith("- ") or stripped.startswith("* "):
                     text = stripped[2:].strip()
                     p = doc.add_paragraph()
@@ -1036,7 +1041,6 @@ def proposal_docx(conversation_id: UUID, db: Session):
                     i += 1
                     continue
 
-                # Regular paragraph
                 p = doc.add_paragraph()
                 p.paragraph_format.space_after = Pt(8)
                 p.paragraph_format.line_spacing = 1.15
@@ -1139,7 +1143,6 @@ def proposal_docx(conversation_id: UUID, db: Session):
             fp.paragraph_format.space_before = Pt(4)
             fp.paragraph_format.space_after = Pt(0)
 
-            # Navy top border
             pPr = fp._p.get_or_add_pPr()
             pBdr = OxmlElement("w:pBdr")
             top_bdr = OxmlElement("w:top")
@@ -1150,7 +1153,6 @@ def proposal_docx(conversation_id: UUID, db: Session):
             pBdr.append(top_bdr)
             pPr.append(pBdr)
 
-            # Tab stops
             fp.paragraph_format.tab_stops.clear_all()
             fp.paragraph_format.tab_stops.add_tab_stop(Cm(0), WD_TAB_ALIGNMENT.LEFT)
             fp.paragraph_format.tab_stops.add_tab_stop(Cm(8.5), WD_TAB_ALIGNMENT.CENTER)
@@ -1158,24 +1160,15 @@ def proposal_docx(conversation_id: UUID, db: Session):
 
             month_year = datetime.now().strftime("%B %Y")
 
-            # Left: client
             _run(fp, f"Circulation Limited: {client_name}", 8, color=_GRAY)
             _run(fp, "\t", 8)
-
-            # Centre: version
             _run(fp, f"Version {version}", 8, color=_GRAY)
             _run(fp, "\t", 8)
-
-            # Right: month‑year, page number, corner mark
             _run(fp, month_year, 8, italic=True, color=_GRAY)
             _run(fp, " ", 8)
-
-            # Page number field
             _add_page_number_field(fp, 8, _GRAY)
-
             _run(fp, " ", 8)
 
-            # Corner mark
             mark = _asset("corner_mark")
             if mark:
                 r = fp.add_run()
@@ -1186,32 +1179,40 @@ def proposal_docx(conversation_id: UUID, db: Session):
         # =====================================================
         # Main logic
         # =====================================================
-        
-        # Count questions and get messages
-        q_count = db.query(ProposalQuestions).count()
+
+        # Fetch all messages for this conversation ordered by time
         messages = (
             db.query(Message)
             .filter(Message.conversation_id == conversation_id)
             .order_by(asc(Message.created_at))
             .all()
         )
-        
-        if len(messages) <= q_count * 2:
-            raise HTTPException(status_code=404, detail="Not enough messages to generate proposal document.")
-        
-        # Find the last assistant message (proposal content)
+
+        # ── FIX: do NOT use q_count * 2 as a message count guard. ─────────────
+        # That check was correct only for the QA path (where each question +
+        # answer pair = 2 messages). When the user uploaded a docx, no QA
+        # messages are stored, so the conversation may have 0 or very few
+        # messages and the old guard would always raise 404.
+        # The real guard is: we need at least one assistant message (the
+        # generated proposal). If none exists, raise 404 below.
+        # ──────────────────────────────────────────────────────────────────────
+
+        if not messages:
+            raise HTTPException(status_code=404, detail="No messages found for this conversation.")
+
+        # Find the last assistant message (the most recent generated proposal)
         last_assistant_message = None
         for msg in reversed(messages):
-            if msg.role == 'assistant':
+            if msg.role == "assistant":
                 last_assistant_message = msg
                 break
-        
+
         if not last_assistant_message:
             raise HTTPException(status_code=404, detail="No assistant message found with proposal content.")
-        
+
         last_proposal_content = last_assistant_message.content
 
-        # Extract client name from questionnaire (first message)
+        # Extract client name from first message metadata (best-effort)
         client_name = "Client"
         try:
             first_message = messages[0] if messages else None
@@ -1252,7 +1253,6 @@ def proposal_docx(conversation_id: UUID, db: Session):
         clean_name = clean_name.replace(" ", "_")
         filename = f"Proposal_{clean_name}_{timestamp}.docx"
 
-        # Return the DOCX file as a streaming response
         return StreamingResponse(
             doc_stream,
             media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -1269,50 +1269,26 @@ def proposal_docx(conversation_id: UUID, db: Session):
         raise HTTPException(status_code=400, detail=f"Error generating proposal document: {str(e)}")
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 def proposal_docx_upload(proposal_content: str, user_email: str, conversation_id: UUID):
     """Upload generated proposal to blob storage with error handling"""
     try:
-        # Create a new document instead of using template if template doesn't exist
         doc = Document()
         
-        # Add title
         title = doc.add_heading('AI Generated Proposal', 0)
         title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
         
-        # Add content
         add_content_to_doc(doc, proposal_content)
         
-        # Save modified DOCX in memory
         doc_stream = io.BytesIO()
         doc.save(doc_stream)
         doc_stream.seek(0)
 
-        # Use main workspaces container as fallback
         container_name = GENERATED_PROPOSALS_CONTAINER_NAME or "workspaces"
         
-        # Create blob client
         generated_blob_service_client = BlobServiceClient.from_connection_string(
             os.environ.get("AZURE_BLOB_STORAGE_CONNECTION_STRING")
         )
         
-        # Create blob path
         blob_path = f"ai-proposals/{user_email}/{conversation_id}/generated_proposal_{uuid.uuid4()}.docx"
         
         generated_blob_client = generated_blob_service_client.get_blob_client(
@@ -1320,15 +1296,12 @@ def proposal_docx_upload(proposal_content: str, user_email: str, conversation_id
             blob=blob_path
         )
         
-        # Upload with error handling
         generated_blob_client.upload_blob(doc_stream, overwrite=True)
         print(f"Successfully uploaded proposal to {container_name}/{blob_path}")
         
     except Exception as e:
         print(f"Warning: Could not upload proposal to blob storage: {e}")
-        # Don't raise exception, just log the warning
 
-    
     # Trigger the indexer
     try:
         indexer_url = f'https://{AZURE_SEARCH_SERVICE}.search.windows.net/indexers/{AZURE_SEARCH_SERVICE_INDEXER_GENERATED_PROPOSALS_NAME}/run?api-version=2020-06-30'
@@ -1338,9 +1311,7 @@ def proposal_docx_upload(proposal_content: str, user_email: str, conversation_id
         }
         response = requests.post(indexer_url, headers=headers)
         response.raise_for_status()
-        
 
-        # Poll for indexer status
         indexer_status_url = f'https://{AZURE_SEARCH_SERVICE}.search.windows.net/indexers/{AZURE_SEARCH_SERVICE_INDEXER_GENERATED_PROPOSALS_NAME}/status?api-version=2020-06-30'
 
         max_retries = 10
@@ -1368,11 +1339,9 @@ async def upload_files(conversation_id: UUID, files: List[UploadFile], db: Sessi
     for file in files:
         contents = await file.read()
 
-        # Generate blob path
         blob_path = f"{user.email}----{conversation_id}/{user.email}----{conversation_id}----{file.filename}"
 
-        # Upload to Azure
-        await upload_file_to_azure_blob(contents, blob_path)  # <-- contents, not file
+        await upload_file_to_azure_blob(contents, blob_path)
 
         uploaded_metadata.append({
             "filename": file.filename,
@@ -1386,9 +1355,7 @@ async def upload_files(conversation_id: UUID, files: List[UploadFile], db: Sessi
         }
         response = requests.post(indexer_url, headers=headers)
         response.raise_for_status()
-        
 
-        # Poll for indexer status
         indexer_status_url = f'https://{AZURE_SEARCH_SERVICE}.search.windows.net/indexers/{AZURE_SEARCH_AI_PROPOSAL_WORKSPACE_INDEXER}/status?api-version=2020-06-30'
 
         max_retries = 10
@@ -1426,7 +1393,6 @@ async def upload_file_to_azure_blob(file: bytes, blob_path: str):
             os.environ.get("AZURE_BLOB_STORAGE_CONNECTION_STRING")
         )
         
-        # Use fallback container if AI Proposal container is not configured
         container_name = AI_PROPOSAL_WORKSPACE_CONTAINER_NAME or "workspaces"
         
         container_client = blob_service_client.get_container_client(container_name)

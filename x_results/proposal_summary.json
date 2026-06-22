@@ -1,6 +1,6 @@
 {
   "client_name": "Client",
-  "generated_date": "2026-06-22T14:03:33.000546",
+  "generated_date": "2026-06-22T16:42:30.347270",
   "sections_completed": [
     "Business Context",
     "Overview",
@@ -18,42 +18,42 @@
     "business_context": {
       "chunks_used": 0,
       "has_content": true,
-      "content_length": 1652
+      "content_length": 1400
     },
     "overview": {
       "chunks_used": 0,
       "has_content": true,
-      "content_length": 987
+      "content_length": 807
     },
     "understanding": {
       "chunks_used": 0,
       "has_content": true,
-      "content_length": 1239
+      "content_length": 991
     },
     "objectives": {
       "chunks_used": 0,
       "has_content": true,
-      "content_length": 976
+      "content_length": 736
     },
     "deliverables": {
       "chunks_used": 0,
       "has_content": true,
-      "content_length": 3067
+      "content_length": 2002
     },
     "approach": {
       "chunks_used": 0,
       "has_content": true,
-      "content_length": 3069
+      "content_length": 3374
     },
     "outcomes": {
       "chunks_used": 0,
       "has_content": true,
-      "content_length": 1779
+      "content_length": 1403
     },
     "business_impact": {
       "chunks_used": 0,
       "has_content": true,
-      "content_length": 2022
+      "content_length": 1657
     }
   },
   "metadata": null
