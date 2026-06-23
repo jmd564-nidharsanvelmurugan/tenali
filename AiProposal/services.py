@@ -101,6 +101,7 @@ azure_client = AzureOpenAI(
 
 
 async def update_message_service(request, db):
+    """Update an existing message's content in the database"""
     message = db.query(Message).filter(
         Message.conversation_id == request.conversation_id,
         Message.id == request.msg_id
@@ -140,6 +141,7 @@ async def fetch_chat_completion(prompt: str, system_prompt: str, docs_prompt: st
 
 
 def iter_block_items(parent):
+    """Iterate through paragraph and table blocks in a Word document"""
     if isinstance(parent, _Document):
         parent_elm = parent.element.body
     elif isinstance(parent, _Cell):
@@ -154,6 +156,7 @@ def iter_block_items(parent):
 
 
 def get_all_text_from_doc(doc):
+    """Extract all text content from a Word document"""
     parts = []
     for block in iter_block_items(doc):
         if isinstance(block, Paragraph):
@@ -168,6 +171,7 @@ def get_all_text_from_doc(doc):
 
 
 def get_proposal_content(proposals: list[ScoredProposals]) -> list[str]:
+    """Retrieve content from proposal template files stored in blob storage"""
     combined_content = []
     for p in proposals:
         try:
@@ -187,6 +191,7 @@ def get_proposal_content(proposals: list[ScoredProposals]) -> list[str]:
 
 
 async def read_sales_call_questions_docx():
+    """Read and return the sales call questions DOCX template from blob storage"""
     blob_name = "templates/sales_call_questions_v1.docx"
     blob_client = blob_service_client.get_blob_client(
         container=PROPOSAL_TEMPLATE_CONTAINER_NAME,
@@ -203,6 +208,7 @@ async def read_sales_call_questions_docx():
 
 
 async def upload_sales_call_questions_docx(user_id: UUID, conversation_id: UUID, file: UploadFile):
+    """Upload a sales call questions DOCX file to blob storage"""
     try:
         blob_service_client_async = AsyncBlobServiceClient.from_connection_string(
             os.environ.get("AZURE_BLOB_STORAGE_CONNECTION_STRING")
@@ -222,9 +228,7 @@ async def upload_sales_call_questions_docx(user_id: UUID, conversation_id: UUID,
 
 
 async def read_uploaded_sales_call_questions_docx(user_id: UUID, conversation_id: UUID):
-    """Reads the uploaded sales call questions DOCX from blob storage.
-    Returns empty string if not present.
-    """
+    """Read the uploaded sales call questions DOCX from blob storage. Returns empty string if not present."""
     blob_name = f"{user_id}----{conversation_id}.docx"
     try:
         blob_service_client_async = AsyncBlobServiceClient.from_connection_string(
@@ -244,49 +248,37 @@ async def read_uploaded_sales_call_questions_docx(user_id: UUID, conversation_id
 
 async def generate_proposal(conversation_id: UUID, db: Session, uid: UUID, user_prompt: str = None):
     """
-    Generate a proposal based on uploaded sales call DOCX (docx path only).
-
+    Generate a proposal based on uploaded sales call DOCX.
+    
     Reads the uploaded questionnaire DOCX from blob storage and passes it
     to the langgraph agent. The conversation does not need any pre-existing
     messages — workspace_id is sourced directly from the Conversation record.
     """
-    # 1. Get current user
+    # Get current user
     current_user = db.query(User).filter_by(id=uid).first()
     if not current_user:
         raise ValueError(f"User {uid} not found")
 
-    print("=" * 100)
-    print("Entered generate_proposal")
-    print(f"Conversation ID: {conversation_id}")
-    print(f"User ID: {uid}")
-    print("=" * 100)
-
-    # 2. Get conversation (needed for workspace_id — no longer relies on messages)
+    # Get conversation (needed for workspace_id)
     conversation = db.query(Conversation).filter_by(id=conversation_id).first()
     if not conversation:
         raise ValueError(f"Conversation {conversation_id} not found")
 
-    # 3. Read the uploaded sales call DOCX from blob storage
+    # Read the uploaded sales call DOCX from blob storage
     client_context_qas = await read_uploaded_sales_call_questions_docx(uid, conversation_id)
 
     if client_context_qas:
         questionnaire_for_agent = client_context_qas
-        print("generate_proposal: using DOCX upload as questionnaire source")
     else:
-        # No docx uploaded — nothing to generate from
-        print("generate_proposal: no DOCX found, questionnaire is empty")
         questionnaire_for_agent = ""
 
-    # 4. Call generate_proposal_langgraph() with the resolved questionnaire + user prompt
+    # Call generate_proposal_langgraph() with the resolved questionnaire + user prompt
     ggg_output = generate_proposal_langgraph(
         questionnaire=questionnaire_for_agent,
         user_prompt=user_prompt or "",
     )
 
-    print("Received output from generate_proposal_langgraph:")
-    print(ggg_output)
-
-    # 5. Extract data from ggg_output
+    # Extract data from ggg_output
     proposal_text = ggg_output.get("proposal_text", "")
     sections = ggg_output.get("sections", [])
 
@@ -301,8 +293,7 @@ async def generate_proposal(conversation_id: UUID, db: Session, uid: UUID, user_
     if not isinstance(citations_list, list):
         citations_list = []
 
-    # 6. Store generated proposal to DB
-    # Use uid + conversation.workspace_id directly — no dependency on pre-existing messages
+    # Store generated proposal to DB
     now = datetime.now(timezone.utc)
     delta = timedelta(milliseconds=1)
 
@@ -337,18 +328,13 @@ async def generate_proposal(conversation_id: UUID, db: Session, uid: UUID, user_
     db.add(reference_proposals)
     db.commit()
 
-    # 7. Upload proposal to blob storage
+    # Upload proposal to blob storage
     try:
         proposal_docx_upload(proposal_text, current_user.email, conversation_id)
-        print("Successfully uploaded proposal to blob storage")
     except Exception as e:
         print(f"Warning: Could not upload to blob storage: {e}")
 
-    print("*" * 100)
-    print("Proposal generation and storage completed successfully.")
-    print("*" * 100)
-
-    # 8. Format sections for frontend
+    # Format sections for frontend
     formatted_sections = []
 
     if sections and len(sections) > 0:
@@ -390,6 +376,7 @@ async def generate_proposal(conversation_id: UUID, db: Session, uid: UUID, user_
 
 
 def edit_answers(request: EditAnswersRequest, db: Session):
+    """Edit answers in the conversation based on provided question IDs and new content"""
     try:
         conv_messages = (
             db.query(Message)
@@ -411,6 +398,7 @@ def edit_answers(request: EditAnswersRequest, db: Session):
 
 
 async def follow_up_proposal_service(conversation_id: UUID, recent_message: str, new_message: str, db: Session, current_user: User):
+    """Generate a follow-up proposal based on new instructions"""
     system_prompt = """Update the entire proposal that is provided based on the new instruction provided.
 Give the full updated proposal. Don't add anything other than updated proposal in the response
 STRICTLY generate the proposal content in a WELL-STRUCTURED MARKDOWN FORMAT, use h1 heading style for section headings, h2, h3 for appropriate sub-headings, ul for bullet points and ol for numbered lists.
@@ -427,9 +415,6 @@ Adhere to the user and system instructions as well.
         llm_response = await fetch_chat_completion(
             prompt, system_prompt, docs_prompt, str(conversation_id)
         )
-
-        print("LLM response received in follow-up service:")
-        print(llm_response)
 
         assistant_content = llm_response["choices"][0]["message"]["content"]
         tool_content = json.dumps({"citations": []})
@@ -500,6 +485,7 @@ Adhere to the user and system instructions as well.
 
 
 def add_content_to_doc(doc, content):
+    """Add HTML or Markdown content to a Word document with proper formatting"""
     if "<" not in content and ">" not in content:
         html_content = markdown(content, extras=["fenced-code-blocks"])
     else:
@@ -545,10 +531,11 @@ def add_content_to_doc(doc, content):
         paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.LEFT
 
 
-
-
-
 def proposal_docx(conversation_id: UUID, db: Session):
+    """
+    Generate a formatted DOCX proposal document from the conversation.
+    Creates a professional proposal with cover page, headers, footers, and styled content.
+    """
     try:
         import os
         import re
@@ -1083,6 +1070,7 @@ def proposal_docx(conversation_id: UUID, db: Session):
 
 
 def proposal_docx_upload(proposal_content: str, user_email: str, conversation_id: UUID):
+    """Upload a generated proposal DOCX to blob storage and trigger search indexer"""
     try:
         doc = Document()
         title = doc.add_heading('AI Generated Proposal', 0)
@@ -1103,7 +1091,6 @@ def proposal_docx_upload(proposal_content: str, user_email: str, conversation_id
             blob=blob_path
         )
         generated_blob_client.upload_blob(doc_stream, overwrite=True)
-        print(f"Successfully uploaded proposal to {container_name}/{blob_path}")
     except Exception as e:
         print(f"Warning: Could not upload proposal to blob storage: {e}")
 
@@ -1130,6 +1117,7 @@ def proposal_docx_upload(proposal_content: str, user_email: str, conversation_id
 
 
 async def upload_files(conversation_id: UUID, files: List[UploadFile], db: Session, user: User):
+    """Upload multiple files to blob storage and trigger search indexer"""
     uploaded_metadata = []
     last_run_status = "Unknown"
     last_run_error = ""
@@ -1171,6 +1159,7 @@ async def upload_files(conversation_id: UUID, files: List[UploadFile], db: Sessi
 
 
 async def upload_file_to_azure_blob(file: bytes, blob_path: str):
+    """Upload a single file to Azure Blob Storage"""
     try:
         blob_service_client_async = AsyncBlobServiceClient.from_connection_string(
             os.environ.get("AZURE_BLOB_STORAGE_CONNECTION_STRING")
@@ -1179,14 +1168,16 @@ async def upload_file_to_azure_blob(file: bytes, blob_path: str):
         container_client = blob_service_client_async.get_container_client(container_name)
         blob_client = container_client.get_blob_client(f"ai-proposals/{blob_path}")
         await blob_client.upload_blob(file, overwrite=True)
-        print(f"Successfully uploaded file to {container_name}/ai-proposals/{blob_path}")
     except Exception as e:
         print(f"Warning: Could not upload file to blob storage: {e}")
         raise HTTPException(status_code=400, detail=f"File upload failed: {str(e)}")
 
 
 async def edit_proposal_llm_service(conversation_id: UUID, new_message: str, db: Session, current_user: User, message_id: UUID = None):
-
+    """
+    Edit a specific part of a proposal using AI based on user instructions.
+    If message_id is provided, uses that specific message; otherwise uses the latest proposal.
+    """
     if message_id:
         message = db.query(Message).filter(
             Message.conversation_id == conversation_id,
