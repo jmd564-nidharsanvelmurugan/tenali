@@ -1,5 +1,6 @@
 from langgraph.graph import StateGraph, END
 from .state import GraphState
+from .nodes.introduction_node import generate_introduction_node  # ← ADD THIS IMPORT
 from .nodes.business_context_node import generate_business_context_node
 from .nodes.overview_node import generate_overview_node
 from .nodes.understanding_node import generate_understanding_node
@@ -17,7 +18,8 @@ def create_proposal_graph():
     
     workflow = StateGraph(GraphState)
     
-    # Add nodes - NO metadata or retrieval nodes (Azure AI Agent handles this automatically)
+    # Add nodes
+    workflow.add_node("generate_introduction", generate_introduction_node)  # ← ADD THIS
     workflow.add_node("generate_business_context", generate_business_context_node)
     workflow.add_node("generate_overview", generate_overview_node)
     workflow.add_node("generate_understanding", generate_understanding_node)
@@ -29,10 +31,11 @@ def create_proposal_graph():
     workflow.add_node("collect_sections", collect_sections_node)
     workflow.add_node("assemble_proposal", assemble_proposal_node)
     
-    # ✅ Set entry point directly to business_context (skip metadata and retrieval)
-    workflow.set_entry_point("generate_business_context")
+    # Set entry point to introduction (it will now run first)
+    workflow.set_entry_point("generate_introduction")
     
-    # ✅ Define edges - sequential flow starting from business_context
+    # Define edges - sequential flow starting from introduction
+    workflow.add_edge("generate_introduction", "generate_business_context")  # ← ADD THIS
     workflow.add_edge("generate_business_context", "generate_overview")
     workflow.add_edge("generate_overview", "generate_understanding")
     workflow.add_edge("generate_understanding", "generate_objectives")
@@ -52,6 +55,7 @@ def run_proposal_generation(questionnaire: dict) -> dict:
     """Run the complete proposal generation workflow using Azure AI Agent."""
     
     import json
+    from datetime import datetime
     
     # Initialize state
     initial_state = {
@@ -63,6 +67,7 @@ def run_proposal_generation(questionnaire: dict) -> dict:
         "document_ids": [],
         "section_chunks": {},
         "section_queries": {},
+        "introduction_to_jman": None,  # ← ADD THIS
         "business_context": None,
         "overview": None,
         "understanding": None,

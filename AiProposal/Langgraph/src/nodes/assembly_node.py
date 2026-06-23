@@ -41,6 +41,7 @@ def generate_proposal_summary(state: GraphState) -> Dict[str, Any]:
     total_chunks = 0
     section_metrics = {}
     section_order = [
+        "introduction_to_jman",
         "business_context", "overview", "understanding", "objectives",
         "deliverables", "approach", "outcomes", "business_impact"
     ]
@@ -587,6 +588,7 @@ def assemble_proposal_node(state: GraphState) -> GraphState:
 
         # 3. Body content
         section_order = [
+            ("introduction_to_jman", "Introduction to JMAN"),
             ("business_context", "Business Context"),
             ("overview",         "Overview"),
             ("understanding",    "Understanding"),

@@ -1,0 +1,6 @@
+{
+    "section": "Overview",
+    "timestamp": "20260623_122245",
+    "source": "Azure AI Agent",
+    "content": "# Overview\n\nVONQ’s operations in preparation for a potential exit are characterized by active involvement from the finance, commercial/CRM, data/analytics, and senior leadership teams, all of whom contribute to exit preparation and investor reporting activities. A range of core systems are currently in use, including a Finance System, a CRM, an ERP, and the Qlik Warehouse, which serves as the primary data and reporting platform.\n\nReporting and analytics are presently managed through Qlik-based dashboards and reports, utilizing data drawn from the Finance System, CRM, ERP, and the Qlik Warehouse. Additional data sources can also include Excel-based datasets and, potentially, other external systems, subject to feasibility. Integration between some source systems and the Qlik Warehouse is not fully automated; select systems require manual, one-off data ingestion to support comprehensive reporting. Legacy data sources may be leveraged to provide a minimum three-year historical trend, as needed for transaction transparency. The data infrastructure is anchored by the Qlik Warehouse, which houses trended and transactional data used for current reporting needs."
+}

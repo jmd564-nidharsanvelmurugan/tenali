@@ -12,6 +12,7 @@ def collect_sections_node(state: GraphState) -> GraphState:
     
     # Map section keys to their display names (production format)
     section_mapping = [
+        ("introduction_to_jman", "Introduction to JMAN"),  # ← ADD THIS LINE FIRST
         ("business_context", "BusinessContext"),
         ("overview", "Understanding"),
         ("understanding", "Objectives"),
@@ -32,6 +33,12 @@ def collect_sections_node(state: GraphState) -> GraphState:
         if section_data and isinstance(section_data, dict):
             content = section_data.get("content", "")
             error = section_data.get("error")
+        else:
+            # If section_data is None, try to get it directly (for introduction)
+            if state_key == "introduction_to_jman":
+                intro_content = state.get("introduction_to_jman")
+                if intro_content and isinstance(intro_content, dict):
+                    content = intro_content.get("content", "")
         
         # Add to sections list in production format
         sections_list.append({

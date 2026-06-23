@@ -37,6 +37,7 @@ class GraphState(TypedDict):
     section_queries: Dict[str, str]
     
     # Generated content
+    introduction_to_jman: Optional[SectionContent]  # ← ADD THIS LINE
     business_context: Optional[SectionContent]
     overview: Optional[SectionContent]
     understanding: Optional[SectionContent]
@@ -51,7 +52,7 @@ class GraphState(TypedDict):
     sections_completed: List[str]
     error: Optional[str]
     
-    # ✅ ADD THIS: Sections list for production format
+    # Sections list for production format
     sections: List[Dict[str, Any]]
     
     # Proposal assembly

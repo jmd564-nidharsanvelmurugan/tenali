@@ -1,0 +1,6 @@
+{
+    "section": "Understanding",
+    "timestamp": "20260623_101850",
+    "source": "Azure AI Agent",
+    "content": "# Understanding\n\n- Limited granularity in existing pipeline reporting hampers the ability to analyze the full customer journey from lead to AUM and accurately assess marketing effectiveness.\n- Absence of integrated Customer Acquisition Cost (CAC) reporting prevents clear measurement of return on marketing investment.\n- Requirement for enhanced Lead-to-AUM (L2A) and CAC data models to provide greater detail and actionable insights for leadership and marketing teams.\n- Prompt need for automated data ingestion and transformation pipelines, specifically to support batch processing of L2A and CAC metrics.\n- Mandatory integration with QuickBooks and Salesforce is required to ensure all relevant data is available for accurate pipeline and CAC analysis.\n- Data quality assessment is a critical requirement to ensure the accuracy and reliability of insights derived from combined sources.\n- The system must support data and technology stakeholders, senior leadership, and marketing teams who depend on accurate, timely reporting for decision-making.\n- Engagement is contingent on timely access to Salesforce, QuickBooks, and existing Microsoft Fabric and Azure Synapse platforms for successful delivery."
+}

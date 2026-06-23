@@ -1,0 +1,6 @@
+{
+    "section": "Objectives",
+    "timestamp": "20260623_123000",
+    "source": "Azure AI Agent",
+    "content": "# Objectives\n\n- Establish a fully designed exit reporting suite that supports the equity narrative, provides a prioritised KPI framework, and includes dashboard concepts aligned to investor needs.\n- Automate data ingestion and refresh pipelines from relevant source systems, enabling recurring updates to support transaction reporting requirements.\n- Deliver investor-grade visibility for senior leadership into key business metrics critical for underpinning the M&A sale process.\n- Enhance user experience for leadership, advisors, and potential acquirers through intuitive dashboards with clear KPI definitions and logical navigation.\n- Standardise exit reporting processes, KPI calculation logic, and data infrastructure to ensure readiness for investor scrutiny.\n- Lay the foundation for lasting, scalable business assets by ensuring the solution and technology choices are extensible, refreshable, and automatable post-transaction.\n- Integrate the future-state platform with Finance System, CRM, ERP, and Qlik Warehouse, while evaluating options for additional tooling and data sources as needed."
+}

@@ -1,0 +1,6 @@
+{
+    "section": "Objectives",
+    "timestamp": "20260623_113651",
+    "source": "Azure AI Agent",
+    "content": "# Objectives\n\n- Achieve a fully designed exit reporting suite providing clear equity narratives, a prioritized KPI framework, dashboard mock-ups, a scalable conceptual data model, and actionable tooling recommendations to guide future implementation.\n- Automate data ingestion and ongoing refresh processes from Finance System, CRM, ERP, and legacy sources into the Qlik Warehouse to support transaction reporting and recurring data updates.\n- Deliver investor-grade visibility for senior leadership and advisors into key financial, commercial, and operational metrics aligned with equity narratives to underpin decision-making in the sale process.\n- Standardize and enhance exit reporting processes, KPI definitions, and data infrastructure, improving readiness for investor scrutiny and support of the M&A transaction.\n- Create intuitive dashboards with clear calculation logic and navigation, making investor reporting accessible, transparent, and aligned with critical business performance indicators.\n- Ensure the future reporting suite and data model are fully extensible and refreshable, supporting additional data sources and automation requirements beyond the transaction to serve as lasting business assets."
+}

@@ -1,7 +1,8 @@
 {
   "client_name": "Client",
-  "generated_date": "2026-06-22T16:42:30.347270",
+  "generated_date": "2026-06-23T14:47:32.674415",
   "sections_completed": [
+    "Introduction to JMAN",
     "Business Context",
     "Overview",
     "Understanding",
@@ -12,48 +13,53 @@
     "Business Impact",
     "collect_sections"
   ],
-  "total_sections": 9,
+  "total_sections": 10,
   "total_chunks_used": 0,
   "section_metrics": {
+    "introduction_to_jman": {
+      "chunks_used": 0,
+      "has_content": true,
+      "content_length": 701
+    },
     "business_context": {
       "chunks_used": 0,
       "has_content": true,
-      "content_length": 1400
+      "content_length": 2009
     },
     "overview": {
       "chunks_used": 0,
       "has_content": true,
-      "content_length": 807
+      "content_length": 941
     },
     "understanding": {
       "chunks_used": 0,
       "has_content": true,
-      "content_length": 991
+      "content_length": 1226
     },
     "objectives": {
       "chunks_used": 0,
       "has_content": true,
-      "content_length": 736
+      "content_length": 1206
     },
     "deliverables": {
       "chunks_used": 0,
       "has_content": true,
-      "content_length": 2002
+      "content_length": 2689
     },
     "approach": {
       "chunks_used": 0,
       "has_content": true,
-      "content_length": 3374
+      "content_length": 3216
     },
     "outcomes": {
       "chunks_used": 0,
       "has_content": true,
-      "content_length": 1403
+      "content_length": 2225
     },
     "business_impact": {
       "chunks_used": 0,
       "has_content": true,
-      "content_length": 1657
+      "content_length": 1777
     }
   },
   "metadata": null
