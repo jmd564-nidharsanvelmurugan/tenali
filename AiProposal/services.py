@@ -531,6 +531,19 @@ def add_content_to_doc(doc, content):
         paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.LEFT
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 def proposal_docx(conversation_id: UUID, db: Session):
     """
     Generate a formatted DOCX proposal document from the conversation.
@@ -541,6 +554,7 @@ def proposal_docx(conversation_id: UUID, db: Session):
         import re
         import json
         import io
+        import base64
         from datetime import datetime
         from docx import Document
         from docx.shared import Inches, Pt, RGBColor, Cm, Emu
@@ -552,6 +566,12 @@ def proposal_docx(conversation_id: UUID, db: Session):
         from typing import Optional, Dict, Any
         from uuid import UUID
         from sqlalchemy import asc
+        from PIL import Image
+        from io import BytesIO
+
+        # Import Azure agent and Gantt tools
+        from .utils.azure_agent import get_agent_response
+        from .utils.gantt import create_hierarchical_gantt
 
         _NAVY    = RGBColor(0x17, 0x38, 0x45)
         _PINK    = RGBColor(0xFF, 0x61, 0x96)
@@ -735,6 +755,155 @@ def proposal_docx(conversation_id: UUID, db: Session):
             fld.append(instr)
             run._r.append(fld)
 
+        # =====================================================
+        # Helper: Generate Gantt chart data from Approach content
+        # =====================================================
+        def _generate_gantt_data(content: str) -> List[Dict[str, Any]]:
+            """Extract phase and task data from Approach content to generate Gantt chart data."""
+            system_prompt = """
+            You are a data extraction specialist. Extract phase and task information from the given Approach section.
+            
+            Parse the Approach content and generate a JSON array of phases with their tasks.
+            
+            Each phase should have:
+            - Name: Phase name with number
+            - Start_Day: Starting day number (1-based)
+            - Finish_Day: Finishing day number
+            - Type: "Phase"
+            - Progress: 0-100 (estimate based on task completion)
+            - isMain: True
+            - tasks: Array of task objects
+            
+            Each task should have:
+            - Name: Task name
+            - Start_Day: Starting day number
+            - Finish_Day: Finishing day number
+            - Type: "Task"
+            - Progress: 0-100 (estimate based on phase progress)
+            
+            Use the timeline information from the Approach section (Week Y to Week Z) to calculate day numbers.
+            Assume each week = 5 working days.
+            
+            Return ONLY the JSON array, no other text.
+            """
+            
+            prompt = f"""
+            Extract phase and task data from this Approach section:
+            
+            {content}
+            
+            Generate a JSON array of phases with tasks in the exact format:
+            [
+                {{
+                    "Name": "Phase 1 - [Name]",
+                    "Start_Day": 1,
+                    "Finish_Day": 21,
+                    "Type": "Phase",
+                    "Progress": 100,
+                    "isMain": True,
+                    "tasks": [
+                        {{
+                            "Name": "Task 1 - [Name]",
+                            "Start_Day": 1,
+                            "Finish_Day": 7,
+                            "Type": "Task",
+                            "Progress": 100
+                        }}
+                    ]
+                }}
+            ]
+            
+            Calculate day numbers from the timeline (Week X to Week Y).
+            Assume 5 working days per week.
+            """
+            
+            response = get_agent_response(prompt, system_prompt)
+            
+            try:
+                json_str = response.strip()
+                if "```json" in json_str:
+                    start = json_str.find("```json") + 7
+                    end = json_str.rfind("```")
+                    json_str = json_str[start:end].strip()
+                elif "```" in json_str:
+                    start = json_str.find("```") + 3
+                    end = json_str.rfind("```")
+                    json_str = json_str[start:end].strip()
+                
+                data = json.loads(json_str)
+                print(f"✅ Successfully extracted {len(data)} phases from Approach content")
+                return data
+            except json.JSONDecodeError as e:
+                print(f"❌ Failed to parse Gantt data: {e}")
+                # Return default structure
+                return [
+                    {
+                        "Name": "Phase 1 - Planning",
+                        "Start_Day": 1,
+                        "Finish_Day": 21,
+                        "Type": "Phase",
+                        "Progress": 100,
+                        "isMain": True,
+                        "tasks": [
+                            {"Name": "Requirements", "Start_Day": 1, "Finish_Day": 7, "Type": "Task", "Progress": 100},
+                            {"Name": "Analysis", "Start_Day": 4, "Finish_Day": 14, "Type": "Task", "Progress": 100},
+                            {"Name": "Approval", "Start_Day": 15, "Finish_Day": 21, "Type": "Task", "Progress": 100}
+                        ]
+                    },
+                    {
+                        "Name": "Phase 2 - Development",
+                        "Start_Day": 22,
+                        "Finish_Day": 45,
+                        "Type": "Phase",
+                        "Progress": 50,
+                        "isMain": True,
+                        "tasks": [
+                            {"Name": "Backend", "Start_Day": 22, "Finish_Day": 30, "Type": "Task", "Progress": 70},
+                            {"Name": "Frontend", "Start_Day": 31, "Finish_Day": 40, "Type": "Task", "Progress": 40},
+                            {"Name": "Integration", "Start_Day": 38, "Finish_Day": 45, "Type": "Task", "Progress": 20}
+                        ]
+                    }
+                ]
+
+        # =====================================================
+        # Helper: Add base64 image to document
+        # =====================================================
+        def _add_base64_image_to_doc(doc, base64_string: str, width_cm: float = 15.0):
+            """Add an image from a base64 string to the document."""
+            if not base64_string:
+                print("   ⚠️ No base64 image data provided")
+                return False
+            
+            try:
+                image_data = base64.b64decode(base64_string)
+                image_stream = BytesIO(image_data)
+                img = Image.open(image_stream)
+                
+                aspect_ratio = img.height / img.width
+                height_cm = width_cm * aspect_ratio
+                image_stream.seek(0)
+                
+                p = doc.add_paragraph()
+                p.paragraph_format.space_before = Pt(12)
+                p.paragraph_format.space_after = Pt(6)
+                p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                
+                run = p.add_run()
+                run.add_picture(image_stream, width=Cm(width_cm), height=Cm(height_cm))
+                
+                caption = doc.add_paragraph()
+                caption.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                _run(caption, "Figure: Project Timeline - Gantt Chart", 9, italic=True, color=_GRAY)
+                caption.paragraph_format.space_before = Pt(4)
+                caption.paragraph_format.space_after = Pt(12)
+                
+                print(f"   ✅ Added Gantt chart image (width: {width_cm}cm, height: {height_cm:.2f}cm)")
+                return True
+                
+            except Exception as e:
+                print(f"   ❌ Failed to add base64 image: {e}")
+                return False
+
         _BOLD_RE = re.compile(r"\*\*(.+?)\*\*")
         _SECTION_DIVIDER_RE = re.compile(r"^---\s*$|^___\s*$|^\*\*\*\s*$")
 
@@ -798,10 +967,17 @@ def proposal_docx(conversation_id: UUID, db: Session):
                     _run(p, val, 10, bold=is_status_col, color=color)
             return tbl
 
-        def _apply_styled_content(doc, raw_text: str, heading_counter: list):
+        def _apply_styled_content(doc, raw_text: str, heading_counter: list, extract_gantt: bool = False):
+            """
+            Apply styled content to document.
+            If extract_gantt is True, this is the Approach section and we should generate Gantt chart.
+            """
             lines = raw_text.splitlines()
             i = 0
             n = len(lines)
+
+            # Collect the approach content to generate Gantt from
+            approach_content = raw_text
 
             while i < n:
                 line = lines[i]
@@ -880,6 +1056,30 @@ def proposal_docx(conversation_id: UUID, db: Session):
                 p.paragraph_format.line_spacing = 1.15
                 _add_inline_runs(p, stripped, 10, _DARK)
                 i += 1
+
+            # After rendering all content, if this is the Approach section, generate and add Gantt chart
+            if extract_gantt and approach_content:
+                print("\n   📊 Generating Gantt chart for Approach section...")
+                try:
+                    # Generate Gantt data from the approach content
+                    gantt_data = _generate_gantt_data(approach_content)
+                    
+                    if gantt_data:
+                        # Create the base64 encoded Gantt chart
+                        base64_gantt = create_hierarchical_gantt(gantt_data)
+                        
+                        if base64_gantt:
+                            # Add the image to the document
+                            _add_base64_image_to_doc(doc, base64_gantt, width_cm=15.0)
+                            print("   ✅ Gantt chart added to document")
+                        else:
+                            print("   ⚠️ Failed to generate base64 Gantt chart")
+                    else:
+                        print("   ⚠️ No Gantt data generated")
+                except Exception as e:
+                    print(f"   ❌ Error generating Gantt chart: {e}")
+                    import traceback
+                    traceback.print_exc()
 
         def _build_cover_section(doc, client_name: str):
             sec = doc.sections[0]
@@ -1044,7 +1244,21 @@ def proposal_docx(conversation_id: UUID, db: Session):
         _build_content_section(doc, client_name, "v1.0")
 
         heading_counter = [0]
-        _apply_styled_content(doc, last_proposal_content, heading_counter)
+        
+        # Split the content into sections based on headings
+        # We need to identify the Approach section by looking for "# Approach" heading
+        sections = re.split(r'(?=^#\s+[A-Za-z])', last_proposal_content, flags=re.MULTILINE)
+        
+        for section in sections:
+            section = section.strip()
+            if not section:
+                continue
+            
+            # Check if this is the Approach section
+            is_approach = bool(re.match(r'^#\s+Approach\b', section, re.IGNORECASE))
+            
+            # Apply styled content with Gantt extraction for Approach section
+            _apply_styled_content(doc, section, heading_counter, extract_gantt=is_approach)
 
         doc_stream = io.BytesIO()
         doc.save(doc_stream)
@@ -1067,6 +1281,9 @@ def proposal_docx(conversation_id: UUID, db: Session):
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=400, detail=f"Error generating proposal document: {str(e)}")
+
+
+
 
 
 def proposal_docx_upload(proposal_content: str, user_email: str, conversation_id: UUID):

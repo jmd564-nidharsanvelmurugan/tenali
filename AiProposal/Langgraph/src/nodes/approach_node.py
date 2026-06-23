@@ -115,6 +115,7 @@ Format the response in well-structured markdown.
     
     # Get response from Azure AI Agent (automatically fetches from AI Search)
     content = get_agent_response(prompt, system_prompt)
+    
     return content
     
 
@@ -177,9 +178,7 @@ def generate_approach_node(state: GraphState) -> GraphState:
         ensure_results_folder()
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         
-        # Save content as Markdown
-        with open(f"x_results/approach_{timestamp}.md", "w", encoding="utf-8") as f:
-            f.write(content)
+        
         
         # Save section metadata
         section_output = {

@@ -154,6 +154,7 @@ def create_hierarchical_gantt(data, output_file=None, return_base64=True):
         showgrid=True,
         gridcolor="#E0E0E0",
         gridwidth=1,
+        tickfont=dict(size=16),  # <--- INCREASED FONT SIZE FOR Y-AXIS LABELS (NAMES)
     )
 
     # ==========================================
@@ -180,6 +181,8 @@ def create_hierarchical_gantt(data, output_file=None, return_base64=True):
         gridwidth=1,
         title="Timeline (Weeks)",
         range=[-0.5, max_week + 0.5],
+        tickfont=dict(size=15),  # <--- INCREASED FONT SIZE FOR X-AXIS TICK LABELS
+        title_font=dict(size=18),  # <--- INCREASED FONT SIZE FOR X-AXIS TITLE
     )
 
     # ==========================================
@@ -220,22 +223,25 @@ def create_hierarchical_gantt(data, output_file=None, return_base64=True):
             "text": "Project Plan - Phase / Task Hierarchy (Day Numbers)",
             "x": 0.5,
             "font": {
-                "size": 24,
+                "size": 28,  # <--- INCREASED TITLE FONT SIZE
                 "color": "#001F6B",
             },
         },
-        height=800,
-        width=1600,
+        height=900,  # <--- INCREASED HEIGHT FOR BETTER VISIBILITY
+        width=1800,  # <--- INCREASED WIDTH FOR BETTER VISIBILITY
         plot_bgcolor="white",
         paper_bgcolor="white",
         legend_title="",
+        legend=dict(
+            font=dict(size=16),  # <--- INCREASED LEGEND FONT SIZE
+        ),
         font={
             "family": "Arial",
-            "size": 13,
+            "size": 14,  # <--- INCREASED GLOBAL FONT SIZE
             "color": "#001F6B",
         },
         margin=dict(
-            l=250,
+            l=280,  # <--- INCREASED LEFT MARGIN FOR LONGER NAMES
             r=50,
             t=80,
             b=50,
@@ -390,4 +396,4 @@ if __name__ == "__main__":
     # create_hierarchical_gantt(data=data, output_file="chart.png", return_base64=False)
     
     # Or get both the base64 and save the file
-    base64_image = create_hierarchical_gantt(data=data, output_file="chart.png", return_base64=True)
+    # base64_image = create_hierarchical_gantt(data=data, output_file="chart.png", return_base64=True)
