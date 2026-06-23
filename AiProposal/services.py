@@ -187,7 +187,7 @@ def get_proposal_content(proposals: list[ScoredProposals]) -> list[str]:
 
 
 async def read_sales_call_questions_docx():
-    blob_name = "templates/sales_call_questions.docx"
+    blob_name = "templates/sales_call_questions_v1.docx"
     blob_client = blob_service_client.get_blob_client(
         container=PROPOSAL_TEMPLATE_CONTAINER_NAME,
         blob=blob_name
