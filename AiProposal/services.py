@@ -545,6 +545,9 @@ def add_content_to_doc(doc, content):
         paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.LEFT
 
 
+
+
+
 def proposal_docx(conversation_id: UUID, db: Session):
     try:
         import os

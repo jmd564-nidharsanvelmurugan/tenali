@@ -4,16 +4,19 @@ on:
   push:
     branches:
       - dev
+
 env:
   CONTAINER_REGISTRY: ${{ secrets.ACR_DEV_URL }}
   BACKEND_IMAGE_NAME: tenaliai-az-backend
   DOCKER_COMPOSE_FILE: docker-compose.yml
+  # Agent environment variables
+  AZURE_ENDPOINT_PROPOSAL: ${{ secrets.AZURE_ENDPOINT_PROPOSAL }}
+  AZURE_AGENT_PROPOSAL: "ai-proposal-langgraph-agent"
 
 jobs:
   build:
     name: Build and Push Images
     runs-on: [self-hosted, linux, x64, dev]
-
     
     steps:
       - name: Clean workspace and pyc files
@@ -40,10 +43,10 @@ jobs:
         run: |
           echo "Building backend image..."
           docker build -t ${{ env.CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.run_number }} -f Dockerfile .
+          
       - name: Push Images to ACR
         run: |
           docker push ${{ env.CONTAINER_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.run_number }}
-
 
   deploy:
     name: Deploy to VM
@@ -53,7 +56,6 @@ jobs:
     environment: development
     
     steps:
-    
       - name: Clean workspace and pyc files
         run: |
           echo "Fixing permissions manually..."
@@ -66,6 +68,34 @@ jobs:
       - name: Login to ACR on VM
         run: |
           echo "${{ secrets.ACR_DEV_PASSWORD }}" | docker login ${{ env.CONTAINER_REGISTRY }} -u "${{ secrets.ACR_DEV_USERNAME }}" --password-stdin
+
+      # ==========================================================
+      # NEW: AGENT MANAGEMENT STEPS
+      # ==========================================================
+      
+      - name: Setup Python for Agent Management
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Install Agent Management Dependencies
+        run: |
+          pip install python-dotenv azure-identity azure-ai-projects
+          
+      - name: Check/Create AI Agent
+        id: agent_management
+        run: |
+          echo "Managing AI Agent..."
+          python scripts/create_or_update_agent.py
+          if [ $? -ne 0 ]; then
+            echo "❌ Agent management failed"
+            exit 1
+          fi
+          echo "✅ Agent management completed successfully"
+
+      # ==========================================================
+      # CONTINUE WITH EXISTING DEPLOYMENT STEPS
+      # ==========================================================
 
       - name: Prepare Deployment
         run: |
