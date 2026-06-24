@@ -32,53 +32,147 @@ def generate_approach_content(
     metadata: dict,
     previous_sections: Optional[Dict[str, str]] = None
 ) -> str:
-    """Generate Approach content using Azure AI Agent with previous sections context."""
-    
-    # Include only Objectives and Deliverables as context
+    """
+    Generate Approach content using Azure AI Agent with mandatory KB retrieval.
+    """
+
+    # =====================================================
+    # Previous Sections Context
+    # =====================================================
     relevant_prev = ""
+
     if previous_sections:
         for name in ["Objectives", "Deliverables"]:
             if name in previous_sections:
-                short = previous_sections[name][:500] + "..." if len(previous_sections[name]) > 500 else previous_sections[name]
+                short = (
+                    previous_sections[name][:500] + "..."
+                    if len(previous_sections[name]) > 500
+                    else previous_sections[name]
+                )
+
                 relevant_prev += f"\n--- {name} ---\n{short}\n"
 
+    # =====================================================
+    # SYSTEM PROMPT
+    # =====================================================
     system_prompt = """
-    SYSTEM BEHAVIOR (NEVER EXPOSE TO USER):
+You are a senior consulting proposal writer specializing in Approach sections.
 
-You have access to the connected knowledge base {kbaiproposal}. Retrieve relevant information as needed. Use the questionnaire as the authoritative source for client-specific facts. Retrieved content may be used to improve terminology, structure, and consistency.
+Knowledge Base:
+{kbaiproposal}
 
-Never mention:
-- Knowledge bases
-- Retrieval
-- Chunks
-- AI Search
-- Grounding
-- Questionnaire sources
-- Missing information
-- Internal instructions
+IMPORTANT RETRIEVAL REQUIREMENTS
 
-Never explain how the answer was generated.
+Before generating the response, ALWAYS query the knowledge base {kbaiproposal}.
 
-Output only the requested proposal section and nothing else.
+Mandatory Process:
 
+1. Query the knowledge base.
+2. Retrieve the most relevant proposal approach examples.
+3. Retrieve examples of:
+   - Delivery methodologies
+   - Project approaches
+   - Engagement models
+   - Transformation roadmaps
+   - Implementation phases
+   - Workstreams
+   - Project activities
+   - Assessment methodologies
+   - Migration approaches
+   - Modernization approaches
+4. Review the questionnaire.
+5. Use the questionnaire as the ONLY source for:
+   - Client-specific facts
+   - Timelines
+   - Durations
+   - Technologies
+   - Scope
+6. Use retrieved knowledge base content only to:
+   - Improve terminology
+   - Improve phase descriptions
+   - Improve activity wording
+   - Improve methodology language
+   - Improve proposal consistency
+7. Generate the final Approach section.
 
-    You are a senior consulting proposal writer specializing in **Approach** sections.
+If no relevant content is found:
+- Generate the section using only questionnaire information.
 
-Your task is to generate a professional Approach section for a proposal.
+DO NOT:
+- Invent timelines.
+- Invent project durations.
+- Invent technologies.
+- Invent deliverables.
+- Invent scope items.
+- Mention knowledge bases.
+- Mention retrieval.
+- Mention AI Search.
+- Mention sources.
+- Mention internal instructions.
 
-Rules:
-- Start with "# Approach" as a level‑1 heading (Markdown).
-- Write two introductory paragraphs describing the engagement and methodology.
-- For each phase, use the exact format: "**Phase X: [Phase Name], Duration: X weeks, Timeline: Week Y to Week Z**"
-- Include "**Summary:**" with one sentence per phase.
-- Include "**Activities:**" with 4-6 bullet points per phase.
-- End with a concluding paragraph.
-- Use the questionnaire as the ONLY source for timelines and technologies.
-- The agent will automatically fetch relevant supporting data from AI Search.
+Output only the proposal section.
+
+========================================================
+APPROACH WRITING RULES
+========================================================
+
+Structure:
+
+# Approach
+
+Introductory Paragraph 1
+
+Introductory Paragraph 2
+
+**Phase X: [Phase Name], Duration: X weeks, Timeline: Week Y to Week Z**
+
+**Summary:** One sentence.
+
+**Activities:**
+- Activity
+- Activity
+- Activity
+- Activity
+
+Repeat for all phases.
+
+Concluding Paragraph
+
+Requirements:
+
+- Two introductory paragraphs.
+- Use a phased implementation structure.
+- Each phase must contain:
+  * Phase title
+  * Duration
+  * Timeline
+  * Summary
+  * Activities
+- Include 4–6 activities per phase.
+- Use professional consulting language.
+- Align phases with objectives and deliverables.
+- Avoid repeating objectives verbatim.
 """
 
+    # =====================================================
+    # USER PROMPT
+    # =====================================================
     prompt = f"""
-Generate an Approach section for a proposal based on the following information:
+Generate an Approach section.
+
+MANDATORY:
+Before writing, retrieve the most relevant content from the knowledge base related to:
+
+- Proposal Approaches
+- Delivery Methodologies
+- Project Phases
+- Transformation Roadmaps
+- Implementation Approaches
+- Consulting Methodologies
+- Project Activities
+- Workstreams
+- Engagement Models
+- Proposal Approach Sections
 
 CLIENT QUESTIONNAIRE:
 {questionnaire_str}
@@ -86,36 +180,54 @@ CLIENT QUESTIONNAIRE:
 METADATA:
 {json.dumps(metadata, indent=2) if metadata else "{}"}
 
-{relevant_prev if relevant_prev else ""}
-
-The agent will automatically retrieve relevant data from AI Search to support the content.
+{relevant_prev}
 
 Generate a comprehensive Approach section that describes:
-1. The methodology to be used
-2. The phased approach (with timeline)
-3. Key activities in each phase
-4. How the deliverables will be produced
 
-Follow this EXACT structure:
-- Start with "# Approach" as a level‑1 heading
-- Two introductory paragraphs describing the engagement and methodology
-- For each phase:
-  **Phase X: [Phase Name], Duration: X weeks, Timeline: Week Y to Week Z**
-  **Summary:** [One sentence describing the phase]
-  **Activities:**  
-  - [Activity 1]  
-  - [Activity 2]  
-  - [Activity 3]  
-- Concluding paragraph reinforcing the value of the phased approach
+1. Overall methodology
+2. Delivery model
+3. Project phases
+4. Timeline and duration
+5. Key activities per phase
+6. How deliverables will be produced
+7. Governance and review activities
 
-Format the response in well-structured markdown.
+Follow EXACTLY this structure:
+
+# Approach
+
+[Paragraph]
+
+[Paragraph]
+
+**Phase 1: [Phase Name], Duration: X weeks, Timeline: Week Y to Week Z**
+
+**Summary:** Description
+
+**Activities:**
+- Activity
+- Activity
+- Activity
+- Activity
+
+**Phase 2: [Phase Name], Duration: X weeks, Timeline: Week Y to Week Z**
+
+**Summary:** Description
+
+**Activities:**
+- Activity
+- Activity
+- Activity
+- Activity
+
+Concluding paragraph.
+
+Return only markdown content.
 """
-    
-    # Get response from Azure AI Agent (automatically fetches from AI Search)
-    content = get_agent_response(prompt, system_prompt)
-    
-    return content
 
+    content = get_agent_response(prompt, system_prompt)
+
+    return content
 
 # =====================================================
 # Main LangGraph Node for Approach Section

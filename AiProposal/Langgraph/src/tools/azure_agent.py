@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 from azure.identity import DefaultAzureCredential, AzureCliCredential, ChainedTokenCredential
 from azure.ai.projects import AIProjectClient
 from typing import Optional
+import re
+import json
 
 load_dotenv()
 
@@ -11,7 +13,7 @@ load_dotenv()
 AZURE_ENDPOINT = os.getenv("AZURE_ENDPOINT_PROPOSAL")
 AZURE_API_KEY = os.getenv("AZURE_API_KEY_PROPOSAL")  # ✅ Your API Key
 AGENT_NAME = os.getenv("AZURE_AGENT_PROPOSAL", "ai-proposal-langgraph-agent")
-AGENT_VERSION = os.getenv("AGENT_VERSION", "1")
+AGENT_VERSION = os.getenv("AGENT_VERSION", "4")
 
 
 class AzureAgentClient:
@@ -42,6 +44,9 @@ class AzureAgentClient:
             self._openai_client = self._project_client.get_openai_client()
         return self._openai_client
     
+
+    
+    
     def get_response(self, prompt: str, system_prompt: Optional[str] = None) -> str:
         """
         Get response from Azure AI Agent using API Key.
@@ -67,7 +72,34 @@ class AzureAgentClient:
                 },
             )
             
-            return response.output_text
+            # ✅ Fixed indentation: This block should be inside the try block
+            print("\n=== KB DOCUMENTS USED ===")
+            freq_blob_urls = {}
+            for item in response.output:
+                if getattr(item, "name", "") == "knowledge_base_retrieve":
+                    matches = re.findall(
+                        r'【\d+:\d+†source】\s*(\{.*?\})',
+                        item.output,
+                        re.DOTALL
+                    )
+                    
+                    for idx, doc in enumerate(matches, start=1):
+                        try:
+                            data = json.loads(doc)
+                            # print("\n" + "=" * 80)
+                            # print("\nBLOB URL:")
+                            # print(data.get("blob_url"))
+                            freq_blob_urls[data.get("blob_url")] = freq_blob_urls.get(data.get("blob_url"), 0) + 1
+                        except Exception as e:
+                            print(f"Error parsing document: {e}")
+                            pass
+            
+            print("\n=== FREQUENCY OF BLOB URLs ===")
+            for url, freq in freq_blob_urls.items():
+                print(f"{url}: {freq}")
+            print(response.output_text)
+            # ✅ Return the response text
+            return response.output_text , freq_blob_urls
             
         except Exception as e:
             print(f"❌ Error calling Azure AI Agent: {e}")

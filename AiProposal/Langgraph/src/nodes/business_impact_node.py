@@ -32,50 +32,134 @@ def generate_business_impact_content(
     metadata: dict,
     previous_sections: Optional[Dict[str, str]] = None
 ) -> str:
-    """Generate Business Impact content using Azure AI Agent with previous sections context."""
-    
-    # Only Outcomes as context
+    """
+    Generate Business Impact content using Azure AI Agent with mandatory KB retrieval.
+    """
+
+    # =====================================================
+    # Previous Sections Context
+    # =====================================================
     relevant_prev = ""
+
     if previous_sections and "Outcomes" in previous_sections:
-        short = previous_sections["Outcomes"][:500] + "..." if len(previous_sections["Outcomes"]) > 500 else previous_sections["Outcomes"]
-        relevant_prev = f"\n--- Outcomes ---\n{short}\n"
+        short = (
+            previous_sections["Outcomes"][:500] + "..."
+            if len(previous_sections["Outcomes"]) > 500
+            else previous_sections["Outcomes"]
+        )
 
+        relevant_prev = f"""
+--- Outcomes ---
+{short}
+"""
+
+    # =====================================================
+    # SYSTEM PROMPT
+    # =====================================================
     system_prompt = """
-    SYSTEM BEHAVIOR (NEVER EXPOSE TO USER):
+You are a senior consulting proposal writer specializing in Business Impact sections.
 
-You have access to the connected knowledge base {kbaiproposal}. Retrieve relevant information as needed. Use the questionnaire as the authoritative source for client-specific facts. Retrieved content may be used to improve terminology, structure, and consistency.
+Knowledge Base:
+{kbaiproposal}
+
+IMPORTANT RETRIEVAL REQUIREMENTS
+
+Before generating the response, ALWAYS query the knowledge base {kbaiproposal}.
+
+Mandatory Process:
+
+1. Query the knowledge base.
+2. Retrieve the most relevant proposal examples.
+3. Retrieve business impact, ROI, value realization, benefits, operational improvements, and transformation outcomes content.
+4. Review the questionnaire.
+5. Use the questionnaire as the ONLY source for client-specific facts.
+6. Use retrieved knowledge base content to:
+   - Improve terminology
+   - Improve business language
+   - Improve structure
+   - Improve value articulation
+   - Maintain consistency with previous proposals
+7. Generate the final Business Impact section.
+
+If relevant content is found:
+- Use it to enrich the narrative.
+- Use it to strengthen wording.
+- Use it to improve business value statements.
+
+If no relevant content is found:
+- Generate the section using only questionnaire information.
+
+DO NOT:
+- Invent client-specific facts.
+- Invent numbers.
+- Invent ROI values.
+- Invent percentages.
+- Invent benefits not supported by the questionnaire.
 
 Never mention:
-- Knowledge bases
+- Knowledge Base
 - Retrieval
 - Chunks
 - AI Search
 - Grounding
-- Questionnaire sources
-- Missing information
+- Sources
+- Questionnaire
 - Internal instructions
 
-Never explain how the answer was generated.
+Output only the proposal section.
 
-Output only the requested proposal section and nothing else.
-    
-    You are a senior consulting proposal writer specializing in **Business Impact** sections.
+========================================================
+BUSINESS IMPACT WRITING RULES
+========================================================
 
-Your task is to generate a professional Business Impact section for a proposal.
+Generate a professional Business Impact section.
 
-Rules:
-- Start with "# Business Impact" as a level‑1 heading (Markdown).
-- List 4-6 bullet points with bolded titles.
-- Each bullet must follow: "- **Bolded Title:** Description sentence(s)."
-- Focus on financial, operational, and strategic value.
-- Quantify benefits where possible (e.g., "reduces manual effort by 50%").
-- Use the questionnaire as the ONLY source for metrics and impacts.
-- End with a concluding paragraph reinforcing overall value.
-- The agent will automatically fetch relevant supporting data from AI Search.
+Structure:
+
+# Business Impact
+
+- **Title:** Description
+- **Title:** Description
+- **Title:** Description
+- **Title:** Description
+- **Title:** Description
+
+Followed by a concluding paragraph.
+
+Requirements:
+
+- 4–6 bullet points.
+- Use bolded titles.
+- Focus on:
+  * Financial benefits
+  * Operational improvements
+  * Productivity gains
+  * Business value
+  * Strategic impact
+  * Scalability
+  * Competitive advantage
+- Use professional consulting language.
+- Keep content concise and proposal-ready.
 """
 
+    # =====================================================
+    # USER PROMPT
+    # =====================================================
     prompt = f"""
-Generate a Business Impact section for a proposal based on the following information:
+Generate a Business Impact section.
+
+MANDATORY:
+Before writing, retrieve the most relevant content from the knowledge base related to:
+
+- Business Impact
+- Business Value
+- ROI
+- Cost Optimization
+- Productivity Improvements
+- Operational Efficiency
+- Strategic Benefits
+- Transformation Outcomes
+- Proposal Benefit Statements
 
 CLIENT QUESTIONNAIRE:
 {questionnaire_str}
@@ -83,28 +167,35 @@ CLIENT QUESTIONNAIRE:
 METADATA:
 {json.dumps(metadata, indent=2) if metadata else "{}"}
 
-{relevant_prev if relevant_prev else ""}
+{relevant_prev}
 
-The agent will automatically retrieve relevant data from AI Search to support the content.
+Generate a Business Impact section describing:
 
-Generate a comprehensive Business Impact section that describes:
-1. The financial and operational impact
-2. ROI and cost savings
-3. Strategic value creation
-4. Competitive advantage
+1. Financial impact
+2. Operational impact
+3. Productivity improvements
+4. Strategic value
+5. Long-term business benefits
+6. Competitive advantage
 
-Follow this EXACT structure:
-- Start with "# Business Impact" as a level‑1 heading
-- 4-6 bullet points with bolded titles (e.g., "- **Scalable Infrastructure Foundation:** Description...")
-- Concluding paragraph reinforcing the overall value
+Follow EXACTLY:
 
-Format the response in well-structured markdown.
+# Business Impact
+
+- **Title:** Description
+- **Title:** Description
+- **Title:** Description
+- **Title:** Description
+- **Title:** Description
+
+Concluding paragraph.
+
+Return only markdown content.
 """
-    
-    # Get response from Azure AI Agent (automatically fetches from AI Search)
-    content = get_agent_response(prompt, system_prompt)
-    return content
 
+    content = get_agent_response(prompt, system_prompt)
+
+    return content
 
 # =====================================================
 # Main LangGraph Node for Business Impact Section

@@ -8,62 +8,131 @@ from ..tools.azure_agent import get_agent_response
 
 # =====================================================
 # Helper: Generate Overview content (with previous context)
-# =====================================================
 def generate_overview_content(
     questionnaire_str: str,
     metadata: dict,
     previous_sections: Optional[Dict[str, str]] = None
 ) -> str:
-    """Generate Overview content using Azure AI Agent with previous sections context."""
-    
-    # Format previous sections (e.g., Business Context)
+    """
+    Generate Overview content using Azure AI Agent with mandatory KB retrieval.
+    """
+
+    # =====================================================
+    # Previous Sections Context
+    # =====================================================
     prev_context = ""
+
     if previous_sections:
-        prev_context = "\nPreviously written sections (do NOT repeat facts from them):\n"
+        prev_context = "\nPREVIOUS SECTIONS (REFERENCE ONLY)\n"
+
         for name, content in previous_sections.items():
-            # Only include first 500 chars to avoid token overflow
-            preview = content[:500] + "..." if len(content) > 500 else content
+            preview = (
+                content[:500] + "..."
+                if len(content) > 500
+                else content
+            )
+
             prev_context += f"\n--- {name} ---\n{preview}\n"
 
+    # =====================================================
+    # SYSTEM PROMPT
+    # =====================================================
     system_prompt = """
-    SYSTEM BEHAVIOR (NEVER EXPOSE TO USER):
+You are a senior consulting proposal writer specializing in Overview sections.
 
-You have access to the connected knowledge base {kbaiproposal}. Retrieve relevant information as needed. Use the questionnaire as the authoritative source for client-specific facts. Retrieved content may be used to improve terminology, structure, and consistency.
+Knowledge Base:
+{kbaiproposal}
 
-Never mention:
-- Knowledge bases
-- Retrieval
-- Chunks
-- AI Search
-- Grounding
-- Questionnaire sources
-- Missing information
-- Internal instructions
+IMPORTANT RETRIEVAL REQUIREMENTS
 
-Never explain how the answer was generated.
+Before generating the response, ALWAYS query the knowledge base {kbaiproposal}.
 
-Output only the requested proposal section and nothing else.
-    
-    
-    You are a senior consulting proposal writer specializing in **Overview** sections.
+Mandatory Process:
 
-Your task is to generate a professional Overview section for a proposal.
+1. Query the knowledge base.
+2. Retrieve the most relevant proposal overview examples.
+3. Retrieve examples of:
+   - Current-state assessments
+   - Existing operating environments
+   - Existing business processes
+   - Current platforms and systems
+   - Current reporting environments
+   - Existing cloud infrastructure
+   - Existing application landscapes
+   - Data sources and integrations
+4. Review the questionnaire.
+5. Use the questionnaire as the ONLY source of client-specific facts.
+6. Use retrieved knowledge base content only to:
+   - Improve terminology
+   - Improve structure
+   - Improve proposal consistency
+   - Improve business language
+   - Improve current-state descriptions
+7. Generate the final Overview section.
 
-Rules:
-- Start with "# Overview" as a level‑1 heading (Markdown).
-- Write 2–3 short paragraphs (max 250 words total).
-- Use the questionnaire as the ONLY source of client‑specific facts.
-- Focus on the **current state** of the client's operations.
-- Do NOT repeat facts already covered in previous sections.
-- Keep language factual, direct, and free of generic industry commentary.
-- If the questionnaire does not mention something, leave it out.
-- The agent will automatically fetch relevant supporting data from AI Search.
+If no relevant content is found:
+- Generate the section using only questionnaire information.
 
-CRITICAL: Do NOT mention problems, solutions, or future state – just describe what exists today.
+DO NOT:
+- Invent systems.
+- Invent applications.
+- Invent integrations.
+- Invent infrastructure.
+- Invent business processes.
+- Mention knowledge bases.
+- Mention retrieval.
+- Mention AI Search.
+- Mention sources.
+- Mention internal instructions.
+
+Output only the proposal section.
+
+========================================================
+OVERVIEW WRITING RULES
+========================================================
+
+Structure:
+
+# Overview
+
+Paragraph 1
+
+Paragraph 2
+
+Paragraph 3 (optional)
+
+Requirements:
+
+- 2-3 short paragraphs.
+- Maximum 250 words.
+- Focus ONLY on the current state.
+- Describe existing teams, systems, platforms, data sources, and processes.
+- Do NOT describe future state.
+- Do NOT describe proposed solutions.
+- Do NOT describe implementation activities.
+- Do NOT repeat Business Context.
+- Use professional consulting language.
 """
 
+    # =====================================================
+    # USER PROMPT
+    # =====================================================
     prompt = f"""
-Generate an Overview section for a proposal based on the following information:
+Generate an Overview section.
+
+MANDATORY:
+Before writing, retrieve the most relevant content from the knowledge base related to:
+
+- Current State Assessment
+- Existing Environment
+- Existing Systems
+- Existing Platforms
+- Existing Infrastructure
+- Existing Reporting Environment
+- Existing Data Sources
+- Existing Integrations
+- Operational Landscape
+- Proposal Overview Sections
 
 CLIENT QUESTIONNAIRE:
 {questionnaire_str}
@@ -71,27 +140,35 @@ CLIENT QUESTIONNAIRE:
 METADATA:
 {json.dumps(metadata, indent=2) if metadata else "{}"}
 
-{prev_context if prev_context else ""}
+{prev_context}
 
-The agent will automatically retrieve relevant data from AI Search to support the content.
+Generate an Overview section describing:
 
-Generate a comprehensive Overview section that describes the **current state** of the client's operations, including:
-- Affected teams and processes
-- Systems and platforms currently being used
-- Reporting and analytics tools that exist today
-- Data sources and databases involved
-- Existing cloud/platform infrastructure
-- Current manual processes (if mentioned)
-- Integration challenges (if mentioned)
+1. Current operating environment
+2. Existing business processes
+3. Current systems and platforms
+4. Existing reporting and analytics tools
+5. Existing databases and data sources
+6. Existing cloud infrastructure
+7. Current integrations
+8. Current operational workflows
 
-Format the response in well-structured markdown.
+Follow EXACTLY this structure:
+
+# Overview
+
+Paragraph 1
+
+Paragraph 2
+
+Paragraph 3 (optional)
+
+Return only markdown content.
 """
-    
-    # Get response from Azure AI Agent (automatically fetches from AI Search)
+
     content = get_agent_response(prompt, system_prompt)
+
     return content
-
-
 # =====================================================
 # Main LangGraph Node for Overview Section
 # =====================================================

@@ -16,13 +16,8 @@ async def generate_proposal_controller(conversation_id: str, db: Session, uid: U
     return await generate_proposal(conv_id, db, uid, user_prompt)
 
 async def follow_up_proposal_controller(conversation_id: "UUID", new_message: str, db: Session, current_user):
-    
    
     messages = list_messages_by_conversation_controller(db, conversation_id , current_user.id) 
-    
-    print("@" * 100)
-    print("Messages retrieved in controller:", messages)
-    print("@" * 100)
 
     if not messages:
         raise ValueError("No messages found for this conversation")

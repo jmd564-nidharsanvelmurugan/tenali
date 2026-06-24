@@ -14,57 +14,132 @@ def generate_understanding_content(
     metadata: dict,
     previous_sections: Optional[Dict[str, str]] = None
 ) -> str:
-    """Generate Understanding content using Azure AI Agent with previous sections context."""
-    
-    # Format previous sections (Business Context and Overview)
+    """
+    Generate Understanding content using Azure AI Agent with mandatory KB retrieval.
+    """
+
+    # =====================================================
+    # Previous Sections Context
+    # =====================================================
     prev_context = ""
+
     if previous_sections:
-        prev_context = "\nPreviously written sections (do NOT repeat facts from them):\n"
+        prev_context = "\nPREVIOUS SECTIONS (REFERENCE ONLY)\n"
+
         for name, content in previous_sections.items():
-            # Show only first 600 chars to keep prompt manageable
-            short = content[:600] + "..." if len(content) > 600 else content
+            short = (
+                content[:600] + "..."
+                if len(content) > 600
+                else content
+            )
+
             prev_context += f"\n--- {name} ---\n{short}\n"
 
+    # =====================================================
+    # SYSTEM PROMPT
+    # =====================================================
     system_prompt = """
-    SYSTEM BEHAVIOR (NEVER EXPOSE TO USER):
+You are a senior consulting proposal writer specializing in Understanding sections.
 
-You have access to the connected knowledge base {kbaiproposal}. Retrieve relevant information as needed. Use the questionnaire as the authoritative source for client-specific facts. Retrieved content may be used to improve terminology, structure, and consistency.
+Knowledge Base:
+{kbaiproposal}
 
-Never mention:
-- Knowledge bases
-- Retrieval
-- Chunks
-- AI Search
-- Grounding
-- Questionnaire sources
-- Missing information
-- Internal instructions
+IMPORTANT RETRIEVAL REQUIREMENTS
 
-Never explain how the answer was generated.
+Before generating the response, ALWAYS query the knowledge base {kbaiproposal}.
 
-Output only the requested proposal section and nothing else.
-    
-    
-    You are a senior consulting proposal writer specializing in **Understanding** sections.
+Mandatory Process:
 
-Your task is to generate a professional Understanding section for a proposal.
+1. Query the knowledge base.
+2. Retrieve the most relevant proposal understanding sections.
+3. Retrieve examples of:
+   - Business challenges
+   - Pain points
+   - Operational inefficiencies
+   - Current process limitations
+   - User requirements
+   - Functional requirements
+   - Non-functional requirements
+   - Security requirements
+   - Compliance requirements
+   - Integration requirements
+4. Review the questionnaire.
+5. Use the questionnaire as the ONLY source of client-specific facts.
+6. Use retrieved knowledge base content only to:
+   - Improve terminology
+   - Improve requirement wording
+   - Improve proposal consistency
+   - Improve business language
+   - Improve structure
+7. Generate the final Understanding section.
 
-Rules:
-- Start with "# Understanding" as a level‑1 heading (Markdown).
-- Then list the key points as **bullet points** (one bullet per point, starting with "- ").
-- Use the questionnaire as the ONLY source of client‑specific facts.
-- Focus on **business problems, pain points, required capabilities, and inefficiencies**.
-- Do NOT repeat facts already covered in previous sections.
-- Keep each bullet point short, factual, direct, and free of generic industry commentary.
-- Aim for 4–8 bullet points covering the most important points.
-- If the questionnaire does not mention something, leave it out.
-- The agent will automatically fetch relevant supporting data from AI Search.
+If no relevant content is found:
+- Generate the section using only questionnaire information.
 
-CRITICAL: Do NOT mention solutions, deliverables, or future state – just describe the problems and requirements in bullet form.
+DO NOT:
+- Invent requirements.
+- Invent integrations.
+- Invent compliance requirements.
+- Invent business challenges.
+- Invent user personas.
+- Mention knowledge bases.
+- Mention retrieval.
+- Mention AI Search.
+- Mention sources.
+- Mention internal instructions.
+
+Output only the proposal section.
+
+========================================================
+UNDERSTANDING WRITING RULES
+========================================================
+
+Structure:
+
+# Understanding
+
+- Point 1
+- Point 2
+- Point 3
+- Point 4
+- Point 5
+
+Requirements:
+
+- 4–8 bullet points.
+- One key point per bullet.
+- Focus on business problems.
+- Focus on pain points.
+- Focus on requirements.
+- Focus on process inefficiencies.
+- Focus on operational challenges.
+- Keep statements concise and factual.
+- Do NOT describe solutions.
+- Do NOT describe deliverables.
+- Do NOT describe implementation activities.
+- Do NOT describe future state.
 """
 
+    # =====================================================
+    # USER PROMPT
+    # =====================================================
     prompt = f"""
-Generate an Understanding section for a proposal based on the following information:
+Generate an Understanding section.
+
+MANDATORY:
+Before writing, retrieve the most relevant content from the knowledge base related to:
+
+- Business Challenges
+- Business Pain Points
+- Operational Inefficiencies
+- Current State Limitations
+- User Requirements
+- Functional Requirements
+- Non-Functional Requirements
+- Security Requirements
+- Compliance Requirements
+- Integration Requirements
+- Proposal Understanding Sections
 
 CLIENT QUESTIONNAIRE:
 {questionnaire_str}
@@ -72,27 +147,36 @@ CLIENT QUESTIONNAIRE:
 METADATA:
 {json.dumps(metadata, indent=2) if metadata else "{}"}
 
-{prev_context if prev_context else ""}
+{prev_context}
 
-The agent will automatically retrieve relevant data from AI Search to support the content.
+Generate a comprehensive Understanding section describing:
 
-Generate a comprehensive Understanding section that describes the **business problems, pain points, and requirements**, including:
-- What business problem is the client trying to solve?
-- What are the current pain points?
-- What inefficiencies exist in the current process?
-- What capabilities or features are required?
-- What workflows should be automated?
-- What user roles/personas will use the system?
-- What security/compliance requirements exist?
-- What integrations are mandatory?
+1. Business problems being addressed
+2. Current pain points
+3. Operational inefficiencies
+4. Process bottlenecks
+5. User requirements
+6. Functional requirements
+7. Security and compliance requirements
+8. Required integrations
+9. Reporting and visibility challenges
 
-Format the response as bullet points in well-structured markdown.
+Follow EXACTLY this structure:
+
+# Understanding
+
+- Key point
+- Key point
+- Key point
+- Key point
+- Key point
+
+Return only markdown content.
 """
-    
-    # Get response from Azure AI Agent (automatically fetches from AI Search)
-    content = get_agent_response(prompt, system_prompt)
-    return content
 
+    content = get_agent_response(prompt, system_prompt)
+
+    return content
 
 # =====================================================
 # Main LangGraph Node for Understanding Section

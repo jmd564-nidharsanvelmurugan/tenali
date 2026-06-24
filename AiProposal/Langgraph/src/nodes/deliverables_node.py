@@ -33,54 +33,134 @@ def generate_deliverables_content(
     metadata: dict,
     previous_sections: Optional[Dict[str, str]] = None
 ) -> str:
-    """Generate Deliverables content using Azure AI Agent with previous sections context."""
-    
-    # Format previous sections to avoid repetition
+    """
+    Generate Deliverables content using Azure AI Agent with mandatory KB retrieval.
+    """
+
+    # =====================================================
+    # Previous Sections Context
+    # =====================================================
     prev_context = ""
+
     if previous_sections:
-        prev_context = "\nPreviously written sections (do NOT repeat facts already stated):\n"
+        prev_context = "\nPREVIOUS SECTIONS (REFERENCE ONLY)\n"
+
         for name, content in previous_sections.items():
-            short = content[:600] + "..." if len(content) > 600 else content
+            short = (
+                content[:600] + "..."
+                if len(content) > 600
+                else content
+            )
+
             prev_context += f"\n--- {name} ---\n{short}\n"
 
+    # =====================================================
+    # SYSTEM PROMPT
+    # =====================================================
     system_prompt = """
-    SYSTEM BEHAVIOR (NEVER EXPOSE TO USER):
+You are a senior consulting proposal writer specializing in Deliverables sections.
 
-You have access to the connected knowledge base {kbaiproposal}. Retrieve relevant information as needed. Use the questionnaire as the authoritative source for client-specific facts. Retrieved content may be used to improve terminology, structure, and consistency.
+Knowledge Base:
+{kbaiproposal}
 
-Never mention:
-- Knowledge bases
-- Retrieval
-- Chunks
-- AI Search
-- Grounding
-- Questionnaire sources
-- Missing information
-- Internal instructions
+========================================================
+MANDATORY RETRIEVAL PROCESS
+========================================================
 
-Never explain how the answer was generated.
+Before generating the response, ALWAYS query the knowledge base {kbaiproposal}.
 
-Output only the requested proposal section and nothing else.
+Mandatory steps:
 
+1. Query the knowledge base.
+2. Retrieve the most relevant proposal deliverables.
+3. Retrieve examples of:
+   - Deliverables
+   - Work products
+   - Artifacts
+   - Assessment reports
+   - Roadmaps
+   - Architecture documents
+   - Implementation outputs
+   - Governance deliverables
+   - Operating model deliverables
+4. Review the questionnaire.
+5. Use the questionnaire as the ONLY source of client-specific facts.
+6. Use retrieved content only to:
+   - Improve terminology
+   - Improve structure
+   - Improve consulting language
+   - Improve deliverable descriptions
+   - Maintain consistency with prior proposals
+7. Generate the final Deliverables section.
 
-    You are a senior consulting proposal writer specializing in **Deliverables** sections.
+If no relevant KB content exists:
+Generate using questionnaire information only.
 
-Your task is to generate a professional Deliverables section for a proposal.
+========================================================
+DO NOT
+========================================================
 
-Rules:
-- Start with "# Deliverables" as a level‑1 heading (Markdown).
-- Then write the opening paragraph customizing the client name.
-- Then list the deliverables as **numbered items** (1., 2., 3., etc.).
-- For each deliverable, write the name on a new line followed by bullet points.
-- Each deliverable should have 2–4 bullet points.
-- End with the concluding paragraph.
-- Use the questionnaire as the ONLY source for deliverable names and descriptions.
-- Do NOT repeat objectives or approach.
-- The agent will automatically fetch relevant supporting data from AI Search.
+- Invent deliverables not supported by the questionnaire.
+- Invent project scope.
+- Invent timelines.
+- Invent client facts.
+- Mention knowledge base retrieval.
+- Mention AI Search.
+- Mention sources.
+- Mention internal instructions.
+
+Output ONLY the Deliverables section.
+
+========================================================
+DELIVERABLES WRITING RULES
+========================================================
+
+Structure:
+
+# Deliverables
+
+Opening paragraph
+
+1. Deliverable Name
+   - Bullet
+   - Bullet
+   - Bullet
+
+2. Deliverable Name
+   - Bullet
+   - Bullet
+   - Bullet
+
+Concluding paragraph
+
+Requirements:
+
+- Professional consulting tone.
+- Numbered deliverables.
+- 2-4 bullets per deliverable.
+- Focus on tangible outputs and artifacts.
+- Avoid repeating Objectives or Approach sections.
 """
 
+    # =====================================================
+    # USER PROMPT
+    # =====================================================
     prompt = f"""
-Generate a Deliverables section for a proposal based on the following information:
+Generate a Deliverables section.
+
+MANDATORY:
+Before writing, retrieve the most relevant content from the knowledge base related to:
+
+- Deliverables
+- Project Artifacts
+- Assessment Deliverables
+- Strategy Deliverables
+- Roadmap Deliverables
+- Architecture Deliverables
+- Implementation Deliverables
+- Governance Deliverables
+- Transformation Deliverables
+- Proposal Deliverables
 
 CLIENT QUESTIONNAIRE:
 {questionnaire_str}
@@ -88,27 +168,39 @@ CLIENT QUESTIONNAIRE:
 METADATA:
 {json.dumps(metadata, indent=2) if metadata else "{}"}
 
-{prev_context if prev_context else ""}
+{prev_context}
 
-The agent will automatically retrieve relevant data from AI Search to support the content.
+Generate a comprehensive Deliverables section that includes:
 
-Generate a comprehensive Deliverables section that lists:
 1. All deliverables to be provided
-2. A description of each deliverable
-3. The format and content of each deliverable
-4. When each deliverable will be delivered
+2. Deliverable descriptions
+3. Deliverable contents
+4. Expected outputs
+5. Tangible artifacts produced during the engagement
 
-Follow this EXACT structure:
-- Start with "# Deliverables" as a level‑1 heading
-- Opening paragraph: "Throughout the engagement with [Client Name], the following key deliverables and artifacts will be provided to ensure a comprehensive and actionable outcome aligned with the project objectives:"
-- Numbered deliverables (1., 2., 3., etc.) with bullet points under each
-- Concluding paragraph: "Each deliverable will be iteratively reviewed with [Client Name]'s leadership and technical teams to ensure alignment with business goals and to incorporate feedback promptly. This structured approach guarantees transparency, accountability, and measurable value throughout the engagement lifecycle."
+Follow EXACTLY this structure:
 
-Format the response in well-structured markdown.
+# Deliverables
+
+Opening paragraph
+
+1. Deliverable Name
+   - Bullet point
+   - Bullet point
+   - Bullet point
+
+2. Deliverable Name
+   - Bullet point
+   - Bullet point
+   - Bullet point
+
+Concluding paragraph
+
+Return only markdown content.
 """
-    
-    # Get response from Azure AI Agent (automatically fetches from AI Search)
+
     content = get_agent_response(prompt, system_prompt)
+
     return content
 
 

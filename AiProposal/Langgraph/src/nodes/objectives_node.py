@@ -14,58 +14,125 @@ def generate_objectives_content(
     metadata: dict,
     previous_sections: Optional[Dict[str, str]] = None
 ) -> str:
-    """Generate Objectives content using Azure AI Agent with previous sections context."""
-    
-    # Format previous sections to avoid repetition
+    """
+    Generate Objectives content using Azure AI Agent with mandatory KB retrieval.
+    """
+
+    # =====================================================
+    # Previous Sections Context
+    # =====================================================
     prev_context = ""
+
     if previous_sections:
-        prev_context = "\nPreviously written sections (do NOT repeat facts already stated):\n"
+        prev_context = "\nPREVIOUS SECTIONS (REFERENCE ONLY)\n"
+
         for name, content in previous_sections.items():
-            short = content[:600] + "..." if len(content) > 600 else content
+            short = (
+                content[:600] + "..."
+                if len(content) > 600
+                else content
+            )
+
             prev_context += f"\n--- {name} ---\n{short}\n"
 
+    # =====================================================
+    # SYSTEM PROMPT
+    # =====================================================
     system_prompt = """
-    SYSTEM BEHAVIOR (NEVER EXPOSE TO USER):
+You are a senior consulting proposal writer specializing in Objectives sections.
 
-You have access to the connected knowledge base {kbaiproposal}. Retrieve relevant information as needed. Use the questionnaire as the authoritative source for client-specific facts. Retrieved content may be used to improve terminology, structure, and consistency.
+Knowledge Base:
+{kbaiproposal}
 
-Never mention:
-- Knowledge bases
-- Retrieval
-- Chunks
-- AI Search
-- Grounding
-- Questionnaire sources
-- Missing information
-- Internal instructions
+IMPORTANT RETRIEVAL REQUIREMENTS
 
-Never explain how the answer was generated.
+Before generating the response, ALWAYS query the knowledge base {kbaiproposal}.
 
-Output only the requested proposal section and nothing else.
-    
-    
-    
-    You are a senior consulting proposal writer specializing in **Objectives** sections.
+Mandatory Process:
 
-Your task is to generate a professional Objectives section for a proposal.
+1. Query the knowledge base.
+2. Retrieve the most relevant proposal objectives.
+3. Retrieve examples of:
+   - Business objectives
+   - Strategic objectives
+   - Operational objectives
+   - Transformation goals
+   - Future-state goals
+   - Modernization objectives
+   - Automation objectives
+   - Digital transformation outcomes
+4. Review the questionnaire.
+5. Use the questionnaire as the ONLY source of client-specific facts.
+6. Use retrieved knowledge base content only to:
+   - Improve terminology
+   - Improve wording
+   - Improve proposal consistency
+   - Improve business language
+   - Improve structure
+7. Generate the final Objectives section.
 
-Rules:
-- Start with "# Objectives" as a level‑1 heading (Markdown).
-- Then list the objectives as **bullet points** (one bullet per objective).
-- Each bullet should be a short, clear statement of a specific goal.
-- Use the questionnaire as the ONLY source of client‑specific goals.
-- Focus on the **desired future state** – what the client wants to achieve.
-- Do NOT repeat problems or context already covered in previous sections.
-- Keep language factual, direct, and solution‑oriented but not technical.
-- Aim for 4–6 bullet points covering strategic, technical, and operational objectives.
-- If the questionnaire does not mention a goal, leave it out.
-- The agent will automatically fetch relevant supporting data from AI Search.
+If no relevant content is found:
+- Generate the section using only questionnaire information.
 
-CRITICAL: Do NOT mention deliverables, approach, or implementation details.
+DO NOT:
+- Invent objectives.
+- Invent client requirements.
+- Invent integrations.
+- Invent future-state goals.
+- Mention knowledge bases.
+- Mention retrieval.
+- Mention AI Search.
+- Mention sources.
+- Mention internal instructions.
+
+Output only the proposal section.
+
+========================================================
+OBJECTIVES WRITING RULES
+========================================================
+
+Structure:
+
+# Objectives
+
+- Objective statement
+- Objective statement
+- Objective statement
+- Objective statement
+- Objective statement
+
+Requirements:
+
+- 4–6 bullet points.
+- One objective per bullet.
+- Focus on desired future state.
+- Focus on business outcomes.
+- Focus on strategic and operational goals.
+- Keep statements concise and professional.
+- Avoid implementation details.
+- Avoid deliverables.
+- Avoid technical solution descriptions.
 """
 
+    # =====================================================
+    # USER PROMPT
+    # =====================================================
     prompt = f"""
-Generate an Objectives section for a proposal based on the following information:
+Generate an Objectives section.
+
+MANDATORY:
+Before writing, retrieve the most relevant content from the knowledge base related to:
+
+- Business Objectives
+- Strategic Goals
+- Operational Goals
+- Transformation Objectives
+- Future-State Vision
+- Automation Objectives
+- Modernization Goals
+- Platform Objectives
+- Business Outcomes
+- Proposal Objectives
 
 CLIENT QUESTIONNAIRE:
 {questionnaire_str}
@@ -73,27 +140,35 @@ CLIENT QUESTIONNAIRE:
 METADATA:
 {json.dumps(metadata, indent=2) if metadata else "{}"}
 
-{prev_context if prev_context else ""}
+{prev_context}
 
-The agent will automatically retrieve relevant data from AI Search to support the content.
+Generate an Objectives section describing:
 
-Generate a comprehensive Objectives section that describes the **desired future state and goals**, including:
-- What should the future-state solution achieve?
-- What processes should become automated?
-- What insights should leadership gain?
-- What user experience improvements are expected?
-- What business processes need improvement?
-- What is the long-term vision for this solution?
-- What scalability requirements exist?
-- What systems should the future platform integrate with?
+1. Desired future state
+2. Business goals
+3. Operational improvements
+4. Leadership objectives
+5. User experience goals
+6. Automation goals
+7. Scalability goals
+8. Integration objectives
 
-Format the response as bullet points in well-structured markdown.
+Follow EXACTLY this structure:
+
+# Objectives
+
+- Objective statement
+- Objective statement
+- Objective statement
+- Objective statement
+- Objective statement
+
+Return only markdown content.
 """
-    
-    # Get response from Azure AI Agent (automatically fetches from AI Search)
-    content = get_agent_response(prompt, system_prompt)
-    return content
 
+    content = get_agent_response(prompt, system_prompt)
+
+    return content
 
 # =====================================================
 # Main LangGraph Node for Objectives Section

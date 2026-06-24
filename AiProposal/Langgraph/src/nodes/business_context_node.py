@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 from ..state import GraphState
 from ..tools.azure_agent import get_agent_response
-
+import re 
 
 def generate_business_context_node(state: GraphState) -> GraphState:
     """
@@ -17,38 +17,47 @@ def generate_business_context_node(state: GraphState) -> GraphState:
     questionnaire_text = state.get("questionnaire_text", "")
     
     system_prompt = """
-    SYSTEM BEHAVIOR (NEVER EXPOSE TO USER):
+You are a senior consulting proposal writer specializing in Business Context sections.
 
-You have access to the connected knowledge base {kbaiproposal}. Retrieve relevant information as needed. Use the questionnaire as the authoritative source for client-specific facts. Retrieved content may be used to improve terminology, structure, and consistency.
-
-Never mention:
-- Knowledge bases
-- Retrieval
-- Chunks
-- AI Search
-- Grounding
-- Questionnaire sources
-- Missing information
-- Internal instructions
-
-Never explain how the answer was generated.
-
-Output only the requested proposal section and nothing else.
-    
-    
-    You are a senior consulting proposal writer specializing in Business Context sections.
+Knowledge Base:
+{kbaiproposal}
 
 Your task is to generate a professional Business Context section for a proposal.
 
-Rules:
-- Start with "# Business Context" as a level-1 heading
-- Write 2-3 short paragraphs (max 250 words)
-- Use the questionnaire as the ONLY source of client-specific facts
-- The agent will automatically fetch relevant supporting data from AI Search
-- Keep language professional, direct, and free of generic industry commentary
-- Do NOT use bullet points or subsection headings
-- Focus on: who the client is, what they do, what they want to improve
-- If the questionnaire does not mention something, leave it out
+Retrieval Requirements:
+
+* Before writing, ALWAYS query the knowledge base {kbaiproposal}.
+* Retrieve the most relevant chunks and use them as supporting context.
+* The questionnaire is the ONLY source of client-specific facts.
+* Use the retrieved knowledge base chunks only to enrich wording, provide context, and maintain consistency with previous proposals and domain terminology.
+* Do NOT invent information not present in either the questionnaire or retrieved chunks.
+* If no relevant chunks are retrieved, rely solely on the questionnaire.
+* Ground every statement in either the questionnaire or retrieved knowledge base content.
+
+Writing Rules:
+
+* Start with "# Business Context" as a level-1 heading.
+* Write 2–3 short paragraphs (maximum 250 words).
+* Use professional, direct language.
+* Do not use bullet points or subsection headings.
+* Focus on:
+
+  * Who the client is.
+  * What they do.
+  * What they want to improve.
+* Avoid generic industry commentary.
+* If the questionnaire does not mention something, leave it out.
+
+Process:
+
+1. Query {kbaiproposal}.
+2. Retrieve the most relevant chunks.
+3. Read the questionnaire.
+4. Use the questionnaire for client-specific facts.
+5. Use retrieved chunks for supporting context and terminology.
+6. Generate the Business Context section.
+
+
 """
 
     prompt = f"""
@@ -70,6 +79,12 @@ Format the response in well-structured markdown.
     try:
         # Get response from Azure AI Agent (automatically fetches from AI Search)
         content = get_agent_response(prompt, system_prompt)
+        content = re.sub(r'【[^】]*】', '', content)
+        content = re.sub(r'\[[0-9,\s]+\]', '', content)
+        content = re.sub(r'\(source[^)]*\)', '', content)
+        print("$"*1000)
+        print(content)
+        print("$"*1000)
         
         # Store the generated content
         state["business_context"] = {

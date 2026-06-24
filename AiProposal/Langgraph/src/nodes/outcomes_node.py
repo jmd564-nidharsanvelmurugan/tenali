@@ -32,54 +32,129 @@ def generate_outcomes_content(
     metadata: dict,
     previous_sections: Optional[Dict[str, str]] = None
 ) -> str:
-    """Generate Outcomes content using Azure AI Agent with previous sections context."""
-    
-    # Include only Objectives, Deliverables, Approach as context
+    """
+    Generate Outcomes content using Azure AI Agent with mandatory KB retrieval.
+    """
+
+    # =====================================================
+    # Previous Sections Context
+    # =====================================================
     relevant_prev = ""
+
     if previous_sections:
         for name in ["Objectives", "Deliverables", "Approach"]:
             if name in previous_sections:
-                short = previous_sections[name][:500] + "..." if len(previous_sections[name]) > 500 else previous_sections[name]
+                short = (
+                    previous_sections[name][:500] + "..."
+                    if len(previous_sections[name]) > 500
+                    else previous_sections[name]
+                )
+
                 relevant_prev += f"\n--- {name} ---\n{short}\n"
 
+    # =====================================================
+    # SYSTEM PROMPT
+    # =====================================================
     system_prompt = """
-    SYSTEM BEHAVIOR (NEVER EXPOSE TO USER):
+You are a senior consulting proposal writer specializing in Outcomes sections.
 
-You have access to the connected knowledge base {kbaiproposal}. Retrieve relevant information as needed. Use the questionnaire as the authoritative source for client-specific facts. Retrieved content may be used to improve terminology, structure, and consistency.
+Knowledge Base:
+{kbaiproposal}
 
-Never mention:
-- Knowledge bases
-- Retrieval
-- Chunks
-- AI Search
-- Grounding
-- Questionnaire sources
-- Missing information
-- Internal instructions
+IMPORTANT RETRIEVAL REQUIREMENTS
 
-Never explain how the answer was generated.
+Before generating the response, ALWAYS query the knowledge base {kbaiproposal}.
 
-Output only the requested proposal section and nothing else.
-    
-    
-    
-    You are a senior consulting proposal writer specializing in **Outcomes** sections.
+Mandatory Process:
 
-Your task is to generate a professional Outcomes section for a proposal.
+1. Query the knowledge base.
+2. Retrieve the most relevant proposal outcome examples.
+3. Retrieve examples of:
+   - Business Outcomes
+   - Expected Benefits
+   - Value Realization
+   - Success Metrics
+   - KPI Improvements
+   - Operational Outcomes
+   - Strategic Outcomes
+   - Transformation Results
+   - Business Value Statements
+4. Review the questionnaire.
+5. Use the questionnaire as the ONLY source for client-specific facts.
+6. Use retrieved knowledge base content only to:
+   - Improve terminology
+   - Improve outcome wording
+   - Improve proposal consistency
+   - Improve business language
+   - Improve structure
+7. Generate the final Outcomes section.
 
-Rules:
-- Start with "# Outcomes" as a level‑1 heading (Markdown).
-- Write an introductory paragraph (2-3 sentences) describing the engagement's impact.
-- Then add "## Expected Business Outcomes" as a level‑2 heading.
-- List 4-6 bullet points with bolded titles.
-- Each bullet must follow: "- **Bolded Title:** Description sentence."
-- Use the questionnaire as the ONLY source for outcomes, metrics, and impacts.
-- The agent will automatically fetch relevant supporting data from AI Search.
-- Do NOT repeat deliverables or approach.
+If no relevant content is found:
+- Generate the section using only questionnaire information.
+
+DO NOT:
+- Invent metrics.
+- Invent KPIs.
+- Invent percentages.
+- Invent business benefits.
+- Invent financial gains.
+- Mention knowledge bases.
+- Mention retrieval.
+- Mention AI Search.
+- Mention sources.
+- Mention internal instructions.
+
+Output only the proposal section.
+
+========================================================
+OUTCOMES WRITING RULES
+========================================================
+
+Structure:
+
+# Outcomes
+
+Introductory paragraph
+
+## Expected Business Outcomes
+
+- **Outcome Title:** Description
+- **Outcome Title:** Description
+- **Outcome Title:** Description
+- **Outcome Title:** Description
+- **Outcome Title:** Description
+
+Requirements:
+
+- Intro paragraph should be 2–3 sentences.
+- Include 4–6 business outcomes.
+- Use bolded titles.
+- Focus on measurable business value.
+- Focus on strategic, operational, and user benefits.
+- Avoid repeating Deliverables.
+- Avoid repeating Approach activities.
+- Use professional consulting language.
 """
 
+    # =====================================================
+    # USER PROMPT
+    # =====================================================
     prompt = f"""
-Generate an Outcomes section for a proposal based on the following information:
+Generate an Outcomes section.
+
+MANDATORY:
+Before writing, retrieve the most relevant content from the knowledge base related to:
+
+- Business Outcomes
+- Expected Benefits
+- Success Metrics
+- KPI Improvements
+- Value Realization
+- Operational Improvements
+- Strategic Outcomes
+- Digital Transformation Results
+- Business Value
+- Proposal Outcomes
 
 CLIENT QUESTIONNAIRE:
 {questionnaire_str}
@@ -87,30 +162,38 @@ CLIENT QUESTIONNAIRE:
 METADATA:
 {json.dumps(metadata, indent=2) if metadata else "{}"}
 
-{relevant_prev if relevant_prev else ""}
-
-The agent will automatically retrieve relevant data from AI Search to support the content.
+{relevant_prev}
 
 Generate a comprehensive Outcomes section that describes:
-1. The expected business outcomes
-2. Key performance indicators (KPIs)
-3. How success will be measured
-4. The impact on the client's business
 
-Follow this EXACT structure:
-- Start with "# Outcomes" as a level‑1 heading
-- Introductory paragraph describing measurable business impact
-- "## Expected Business Outcomes" as a level‑2 heading
-- 4-6 bullet points with bolded titles (e.g., "- **Enhanced Customer Retention:** Description...")
+1. Expected business outcomes
+2. Success criteria
+3. KPI improvements
+4. Operational benefits
+5. Strategic value
+6. User and stakeholder benefits
+7. Long-term business impact
 
-Format the response in well-structured markdown.
+Follow EXACTLY this structure:
+
+# Outcomes
+
+Introductory paragraph
+
+## Expected Business Outcomes
+
+- **Outcome Title:** Description
+- **Outcome Title:** Description
+- **Outcome Title:** Description
+- **Outcome Title:** Description
+- **Outcome Title:** Description
+
+Return only markdown content.
 """
-    
-    # Get response from Azure AI Agent (automatically fetches from AI Search)
+
     content = get_agent_response(prompt, system_prompt)
+
     return content
-
-
 # =====================================================
 # Main LangGraph Node for Outcomes Section
 # =====================================================
