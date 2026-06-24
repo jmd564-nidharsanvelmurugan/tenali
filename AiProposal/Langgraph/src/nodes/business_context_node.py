@@ -1,9 +1,11 @@
 # src/nodes/business_context_node.py
 import json
+import re
 from datetime import datetime
 from ..state import GraphState
 from ..tools.azure_agent import get_agent_response
-import re 
+from ..utils.citation_utils import merge_citation_freq_maps
+
 
 def generate_business_context_node(state: GraphState) -> GraphState:
     """
@@ -41,12 +43,12 @@ Writing Rules:
 * Use professional, direct language.
 * Do not use bullet points or subsection headings.
 * Focus on:
-
   * Who the client is.
   * What they do.
   * What they want to improve.
 * Avoid generic industry commentary.
 * If the questionnaire does not mention something, leave it out.
+* Do NOT include any citations, references, or source markers like [1], [2], (source), or 【4:17†source】 in your response.
 
 Process:
 
@@ -56,8 +58,6 @@ Process:
 4. Use the questionnaire for client-specific facts.
 5. Use retrieved chunks for supporting context and terminology.
 6. Generate the Business Context section.
-
-
 """
 
     prompt = f"""
@@ -77,38 +77,59 @@ Format the response in well-structured markdown.
 """
     
     try:
-        # Get response from Azure AI Agent (automatically fetches from AI Search)
-        content = get_agent_response(prompt, system_prompt)
+        # Get response from Azure AI Agent - now returns (content, freq_blob_urls)
+        content, freq_blob_urls = get_agent_response(prompt, system_prompt)
+        
+        # Additional cleanup for any remaining citations (backup)
         content = re.sub(r'【[^】]*】', '', content)
         content = re.sub(r'\[[0-9,\s]+\]', '', content)
         content = re.sub(r'\(source[^)]*\)', '', content)
+        content = re.sub(r'\s+', ' ', content).strip()
+        
         print("$"*1000)
         print(content)
         print("$"*1000)
         
-        # Store the generated content
+        # =====================================================
+        # Merge citation frequencies into the global map
+        # =====================================================
+        state["citation_freq_map"] = merge_citation_freq_maps(
+            state.get("citation_freq_map", {}),
+            freq_blob_urls
+        )
+        
+        # =====================================================
+        # Store the generated content with citation info
+        # =====================================================
         state["business_context"] = {
             "content": content,
             "timestamp": datetime.now().isoformat(),
             "retrieval_query": "Business Context",
-            "chunks_used": 0,
-            "document_ids_used": []
+            "chunks_used": len(freq_blob_urls),
+            "document_ids_used": list(freq_blob_urls.keys()),
+            "citations_freq": freq_blob_urls
         }
         
         state["sections_completed"].append("Business Context")
         
         print(f"✅ Business Context Generated ({len(content)} characters)")
+        print(f"📊 Citations found in this section: {len(freq_blob_urls)} unique documents")
+        print(f"📊 Total unique citations so far: {len(state['citation_freq_map'])}")
         print(content[:200] + "..." if len(content) > 200 else content)
         
     except Exception as e:
         print(f"❌ Error generating Business Context: {e}")
+        import traceback
+        traceback.print_exc()
+        
         state["error"] = f"Business Context generation failed: {str(e)}"
         state["business_context"] = {
             "content": f"Error generating Business Context: {str(e)}",
             "timestamp": datetime.now().isoformat(),
             "retrieval_query": "Business Context",
             "chunks_used": 0,
-            "document_ids_used": []
+            "document_ids_used": [],
+            "citations_freq": {}
         }
     
     return state

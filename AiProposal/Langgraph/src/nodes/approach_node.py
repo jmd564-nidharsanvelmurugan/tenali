@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Optional, Dict, Any
 from ..state import GraphState
 from ..tools.azure_agent import get_agent_response
+from ..utils.citation_utils import merge_citation_freq_maps
 
 
 # =====================================================
@@ -31,9 +32,10 @@ def generate_approach_content(
     questionnaire_str: str,
     metadata: dict,
     previous_sections: Optional[Dict[str, str]] = None
-) -> str:
+) -> tuple:
     """
     Generate Approach content using Azure AI Agent with mandatory KB retrieval.
+    Returns: (content, freq_blob_urls)
     """
 
     # =====================================================
@@ -152,6 +154,7 @@ Requirements:
 - Use professional consulting language.
 - Align phases with objectives and deliverables.
 - Avoid repeating objectives verbatim.
+- Do NOT include any citations, references, or source markers like [1], [2], (source), or 【4:17†source】 in your response.
 """
 
     # =====================================================
@@ -225,9 +228,11 @@ Concluding paragraph.
 Return only markdown content.
 """
 
-    content = get_agent_response(prompt, system_prompt)
+    # Get response from Azure AI Agent (returns content and freq map)
+    content, freq_blob_urls = get_agent_response(prompt, system_prompt)
 
-    return content
+    return content, freq_blob_urls
+
 
 # =====================================================
 # Main LangGraph Node for Approach Section
@@ -264,26 +269,43 @@ def generate_approach_node(state: GraphState) -> GraphState:
     # STEP 2: Generate content using Azure AI Agent
     # =====================================================
     try:
-        content = generate_approach_content(
+        content, freq_blob_urls = generate_approach_content(
             questionnaire_str=state["questionnaire_text"],
             metadata=state["metadata_dict"],
             previous_sections=previous_sections if previous_sections else None
         )
         
+        # Debug print to see full content
+        print("$" * 1000)
+        print(content)
+        print("$" * 1000)
+        
         # =====================================================
-        # STEP 3: Store in state only (no file saving)
+        # STEP 3: Merge citation frequencies into the global map
+        # =====================================================
+        state["citation_freq_map"] = merge_citation_freq_maps(
+            state.get("citation_freq_map", {}),
+            freq_blob_urls
+        )
+        
+        # =====================================================
+        # STEP 4: Store in state
         # =====================================================
         state["approach"] = {
             "content": content,
             "timestamp": datetime.now().isoformat(),
             "retrieval_query": "Approach (Azure AI Agent)",
-            "chunks_used": 0,
-            "document_ids_used": []
+            "chunks_used": len(freq_blob_urls),
+            "document_ids_used": list(freq_blob_urls.keys()),
+            "citations_freq": freq_blob_urls
         }
         
         print("\n" + "=" * 60)
         print("✅ Approach Generated")
         print("=" * 60)
+        print(f"📝 Content length: {len(content)} characters")
+        print(f"📊 Citations found in this section: {len(freq_blob_urls)} unique documents")
+        print(f"📊 Total unique citations so far: {len(state['citation_freq_map'])}")
         print(content[:200] + "..." if len(content) > 200 else content)
         print(f"\n💾 Stored in memory (state)")
         
@@ -291,13 +313,17 @@ def generate_approach_node(state: GraphState) -> GraphState:
         
     except Exception as e:
         print(f"❌ Error generating Approach: {e}")
+        import traceback
+        traceback.print_exc()
+        
         state["error"] = f"Approach generation failed: {str(e)}"
         state["approach"] = {
             "content": f"Error generating Approach: {str(e)}",
             "timestamp": datetime.now().isoformat(),
             "retrieval_query": "Approach (Azure AI Agent)",
             "chunks_used": 0,
-            "document_ids_used": []
+            "document_ids_used": [],
+            "citations_freq": {}
         }
     
     return state

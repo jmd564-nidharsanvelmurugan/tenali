@@ -1,3 +1,4 @@
+# src/state.py
 from typing import TypedDict, List, Dict, Any, Optional
 from datetime import datetime
 
@@ -18,6 +19,7 @@ class SectionContent(TypedDict):
     retrieval_query: str
     chunks_used: int
     document_ids_used: Optional[List[str]]
+    citations_freq: Optional[Dict[str, int]]  # Section-specific citation frequencies
 
 class GraphState(TypedDict):
     # Input
@@ -37,7 +39,7 @@ class GraphState(TypedDict):
     section_queries: Dict[str, str]
     
     # Generated content
-    introduction_to_jman: Optional[SectionContent]  # ← ADD THIS LINE
+    introduction_to_jman: Optional[SectionContent]
     business_context: Optional[SectionContent]
     overview: Optional[SectionContent]
     understanding: Optional[SectionContent]
@@ -57,3 +59,7 @@ class GraphState(TypedDict):
     
     # Proposal assembly
     proposal: Optional[Dict[str, Any]]
+    
+    # Citation tracking
+    citation_freq_map: Dict[str, int]  # Accumulated citations from all nodes
+    citations: List[str]  # Top 3 citation URLs (strings)

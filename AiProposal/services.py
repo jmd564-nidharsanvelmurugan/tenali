@@ -277,6 +277,12 @@ async def generate_proposal(conversation_id: UUID, db: Session, uid: UUID, user_
         questionnaire=questionnaire_for_agent,
         user_prompt=user_prompt or "",
     )
+    
+
+    print("@"*1000)
+    print(ggg_output.get("citations", {}).get("citations", []))
+    print("@"*1000)
+
 
     # Extract data from ggg_output
     proposal_text = ggg_output.get("proposal_text", "")

@@ -1,9 +1,9 @@
 # src/tools/azure_agent.py
 import os
 from dotenv import load_dotenv
-from azure.identity import DefaultAzureCredential, AzureCliCredential, ChainedTokenCredential
+from azure.identity import DefaultAzureCredential
 from azure.ai.projects import AIProjectClient
-from typing import Optional
+from typing import Optional, Tuple, Dict
 import re
 import json
 
@@ -11,7 +11,7 @@ load_dotenv()
 
 # Azure AI Foundry Configuration
 AZURE_ENDPOINT = os.getenv("AZURE_ENDPOINT_PROPOSAL")
-AZURE_API_KEY = os.getenv("AZURE_API_KEY_PROPOSAL")  # ✅ Your API Key
+AZURE_API_KEY = os.getenv("AZURE_API_KEY_PROPOSAL")
 AGENT_NAME = os.getenv("AZURE_AGENT_PROPOSAL", "ai-proposal-langgraph-agent")
 AGENT_VERSION = os.getenv("AGENT_VERSION", "4")
 
@@ -23,33 +23,43 @@ class AzureAgentClient:
         self._project_client = None
         self._openai_client = None
     
-    def _get_credential(self):
-        """
-        Get Azure credentials using API Key.
-        The API Key is passed directly to the client.
-        """
-        # ✅ For API Key, we don't need a credential object
-        # We'll pass it directly to the client
-        return None
-    
     def _get_clients(self):
         """Get or initialize the Azure AI clients."""
         if self._project_client is None:
-            # ✅ API Key authentication - pass api_key directly
             self._project_client = AIProjectClient(
                 endpoint=AZURE_ENDPOINT,
-                credential=DefaultAzureCredential(),  # Fallback for other auth
-                api_key=AZURE_API_KEY,  # ✅ Your API Key
+                credential=DefaultAzureCredential(),
+                api_key=AZURE_API_KEY,
             )
             self._openai_client = self._project_client.get_openai_client()
         return self._openai_client
     
-
+    def clean_citations_preserve_flow(self, text):
+        """
+        Remove citations while preserving the natural flow of text
+        """
+        if not text:
+            return text
+            
+        # Remove citation markers 【number:number†source】
+        citation_pattern = r'【\d+:\d+†source】'
+        text = re.sub(citation_pattern, '', text)
+        
+        # Remove any brackets that might be citations [1], [2], etc.
+        text = re.sub(r'\[\d+\]', '', text)
+        
+        # Clean up punctuation
+        text = re.sub(r'\.\s*\.', '.', text)
+        text = re.sub(r'\.\s+,', ',', text)
+        text = re.sub(r'\s+', ' ', text).strip()
+        text = re.sub(r'\.\s+', '. ', text)
+        
+        return text
     
-    
-    def get_response(self, prompt: str, system_prompt: Optional[str] = None) -> str:
+    def get_response(self, prompt: str, system_prompt: Optional[str] = None) -> Tuple[str, Dict[str, int]]:
         """
         Get response from Azure AI Agent using API Key.
+        Returns: (cleaned_text, freq_blob_urls)
         """
         try:
             client = self._get_clients()
@@ -60,7 +70,7 @@ class AzureAgentClient:
                 input_messages.append({"role": "user", "content": f"System instructions: {system_prompt}"})
             input_messages.append({"role": "user", "content": prompt})
             
-            # ✅ Call the agent with API Key authentication
+            # Call the agent
             response = client.responses.create(
                 input=input_messages,
                 extra_body={
@@ -72,9 +82,10 @@ class AzureAgentClient:
                 },
             )
             
-            # ✅ Fixed indentation: This block should be inside the try block
-            print("\n=== KB DOCUMENTS USED ===")
+            # Parse KB documents and build frequency map
             freq_blob_urls = {}
+            print("\n=== KB DOCUMENTS USED ===")
+            
             for item in response.output:
                 if getattr(item, "name", "") == "knowledge_base_retrieve":
                     matches = re.findall(
@@ -86,50 +97,35 @@ class AzureAgentClient:
                     for idx, doc in enumerate(matches, start=1):
                         try:
                             data = json.loads(doc)
-                            # print("\n" + "=" * 80)
-                            # print("\nBLOB URL:")
-                            # print(data.get("blob_url"))
-                            freq_blob_urls[data.get("blob_url")] = freq_blob_urls.get(data.get("blob_url"), 0) + 1
+                            blob_url = data.get("blob_url")
+                            if blob_url:
+                                freq_blob_urls[blob_url] = freq_blob_urls.get(blob_url, 0) + 1
                         except Exception as e:
                             print(f"Error parsing document: {e}")
                             pass
             
+            # Print frequency of BLOB URLs
             print("\n=== FREQUENCY OF BLOB URLs ===")
             for url, freq in freq_blob_urls.items():
                 print(f"{url}: {freq}")
-            print(response.output_text)
-            # ✅ Return the response text
-            return response.output_text , freq_blob_urls
+            
+            # Clean citations from response
+            cleaned_text = response.output_text
+            
+            print("\n=== CLEANED RESPONSE PREVIEW ===")
+            print(cleaned_text[:500] + "..." if len(cleaned_text) > 500 else cleaned_text)
+            
+            return cleaned_text, freq_blob_urls
             
         except Exception as e:
             print(f"❌ Error calling Azure AI Agent: {e}")
-            return f"Error: {str(e)}"
+            return f"Error: {str(e)}", {}
 
 
 # Global instance
 azure_agent = AzureAgentClient()
 
 
-def get_agent_response(prompt: str, system_prompt: Optional[str] = None) -> str:
+def get_agent_response(prompt: str, system_prompt: Optional[str] = None) -> Tuple[str, Dict[str, int]]:
     """Convenience function to get response from Azure AI Agent."""
     return azure_agent.get_response(prompt, system_prompt)
-
-
-# For testing
-if __name__ == "__main__":
-    print("=" * 60)
-    print("Testing Azure AI Agent (with API Key)")
-    print("=" * 60)
-    
-    print(f"Endpoint: {AZURE_ENDPOINT}")
-    print(f"API Key: {'✅ Set' if AZURE_API_KEY else '✗ Not Set'}")
-    print(f"Agent Name: {AGENT_NAME}")
-    print(f"Agent Version: {AGENT_VERSION}")
-    
-    test_prompt = "Tell me what you can help with."
-    try:
-        response = get_agent_response(test_prompt)
-        print(f"\n✅ Response: {response}")
-        print("\n✅ Connection successful!")
-    except Exception as e:
-        print(f"\n❌ Test failed: {e}")

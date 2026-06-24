@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Optional, Dict, Any
 from ..state import GraphState
 from ..tools.azure_agent import get_agent_response
+from ..utils.citation_utils import merge_citation_freq_maps, get_top_citation_urls
 
 
 # =====================================================
@@ -31,9 +32,10 @@ def generate_business_impact_content(
     questionnaire_str: str,
     metadata: dict,
     previous_sections: Optional[Dict[str, str]] = None
-) -> str:
+) -> tuple:
     """
     Generate Business Impact content using Azure AI Agent with mandatory KB retrieval.
+    Returns: (content, freq_blob_urls)
     """
 
     # =====================================================
@@ -140,6 +142,7 @@ Requirements:
   * Competitive advantage
 - Use professional consulting language.
 - Keep content concise and proposal-ready.
+- Do NOT include any citations, references, or source markers like [1], [2], (source), or 【4:17†source】 in your response.
 """
 
     # =====================================================
@@ -193,9 +196,11 @@ Concluding paragraph.
 Return only markdown content.
 """
 
-    content = get_agent_response(prompt, system_prompt)
+    # Get response from Azure AI Agent (returns content and freq map)
+    content, freq_blob_urls = get_agent_response(prompt, system_prompt)
 
-    return content
+    return content, freq_blob_urls
+
 
 # =====================================================
 # Main LangGraph Node for Business Impact Section
@@ -205,6 +210,7 @@ def generate_business_impact_node(state: GraphState) -> GraphState:
     LangGraph node for generating Business Impact section using Azure AI Agent.
     The agent automatically retrieves relevant data from AI Search.
     Focuses on financial, operational, and strategic value.
+    This is the FINAL node that extracts the top 3 citations.
     """
     
     print("\n" + "=" * 60)
@@ -222,45 +228,85 @@ def generate_business_impact_node(state: GraphState) -> GraphState:
     if state.get("outcomes") and state["outcomes"].get("content"):
         previous_sections["Outcomes"] = state["outcomes"]["content"]
         print(f"📖 Loaded Outcomes for reference")
+    else:
+        print(f"ℹ️ No Outcomes section available for reference")
     
     # =====================================================
     # STEP 2: Generate content using Azure AI Agent
     # =====================================================
     try:
-        content = generate_business_impact_content(
+        content, freq_blob_urls = generate_business_impact_content(
             questionnaire_str=state["questionnaire_text"],
             metadata=state["metadata_dict"],
             previous_sections=previous_sections if previous_sections else None
         )
         
+        # Debug print to see full content
+        print("$" * 1000)
+        print(content)
+        print("$" * 1000)
+        
         # =====================================================
-        # STEP 3: Store in state only (no file saving)
+        # STEP 3: Merge citation frequencies into the global map
+        # =====================================================
+        state["citation_freq_map"] = merge_citation_freq_maps(
+            state.get("citation_freq_map", {}),
+            freq_blob_urls
+        )
+        
+        # =====================================================
+        # STEP 4: Extract Top 3 Citation URLs
+        # This is the FINAL step - get top 3 URLs as strings
+        # =====================================================
+        top_urls = get_top_citation_urls(state["citation_freq_map"], top_n=3)
+        state["citations"] = top_urls  # List of strings (URLs)
+        
+        print("\n" + "=" * 60)
+        print("📊 TOP 3 CITATION URLs (Global):")
+        print("=" * 60)
+        if top_urls:
+            for i, url in enumerate(top_urls, 1):
+                print(f"{i}. {url}")
+        else:
+            print("No citations found")
+        print("=" * 60)
+        
+        # =====================================================
+        # STEP 5: Store in state
         # =====================================================
         state["business_impact"] = {
             "content": content,
             "timestamp": datetime.now().isoformat(),
             "retrieval_query": "Business Impact (Azure AI Agent)",
-            "chunks_used": 0,
-            "document_ids_used": []
+            "chunks_used": len(freq_blob_urls),
+            "document_ids_used": list(freq_blob_urls.keys()),
+            "citations_freq": freq_blob_urls
         }
         
         print("\n" + "=" * 60)
         print("✅ Business Impact Generated")
         print("=" * 60)
-        print(content[:200] + "..." if len(content) > 200 else content)
+        print(f"📝 Content length: {len(content)} characters")
+        print(f"📊 Citations found in this section: {len(freq_blob_urls)} unique documents")
+        print(f"📊 Total unique citations across all sections: {len(state['citation_freq_map'])}")
+        print(f"📊 Top 3 citations stored in state['citations']")
         print(f"\n💾 Stored in memory (state)")
         
         state["sections_completed"].append(section_name)
         
     except Exception as e:
         print(f"❌ Error generating Business Impact: {e}")
+        import traceback
+        traceback.print_exc()
+        
         state["error"] = f"Business Impact generation failed: {str(e)}"
         state["business_impact"] = {
             "content": f"Error generating Business Impact: {str(e)}",
             "timestamp": datetime.now().isoformat(),
             "retrieval_query": "Business Impact (Azure AI Agent)",
             "chunks_used": 0,
-            "document_ids_used": []
+            "document_ids_used": [],
+            "citations_freq": {}
         }
     
     return state

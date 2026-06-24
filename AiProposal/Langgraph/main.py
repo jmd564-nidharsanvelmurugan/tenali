@@ -46,7 +46,6 @@ def generate_proposal_langgraph(questionnaire: str, user_prompt: str = ""):
         # =========================================================================
         # SECTION 1: Extract Sections from final_state
         # =========================================================================
-        # ✅ Get sections from final_state (populated by collect_sections_node)
         sections = final_state.get("sections", [])
         
         # If sections is empty, try to build from individual section data
@@ -106,35 +105,82 @@ def generate_proposal_langgraph(questionnaire: str, user_prompt: str = ""):
             proposal_text = f"Generated proposal for: {user_prompt if user_prompt else 'Client'}"
 
         # =========================================================================
-        # SECTION 3: Extract Citations
+        # SECTION 3: Extract Citations from State
         # =========================================================================
+        # Get citations from state - these are the top 3 URLs from business_impact_node
         citations_list = []
         
+        # First, try to get citations directly from state
         citations = final_state.get("citations", [])
-        if isinstance(citations, dict):
-            citations_list = citations.get("citations", [])
-        elif isinstance(citations, list):
-            citations_list = citations
         
+        if isinstance(citations, list):
+            # If citations is a list of strings (URLs)
+            if citations and isinstance(citations[0], str):
+                citations_list = [
+                    {
+                        "filepath": f"Document_{i+1}",
+                        "url": url
+                    }
+                    for i, url in enumerate(citations)
+                ]
+                logger.info(f"📊 Found {len(citations_list)} citations from state (as URLs)")
+            # If citations is a list of dicts
+            elif citations and isinstance(citations[0], dict):
+                citations_list = citations
+                logger.info(f"📊 Found {len(citations_list)} citations from state (as dicts)")
+        elif isinstance(citations, dict):
+            # If citations is a dict with a 'citations' key
+            citations_list = citations.get("citations", [])
+            logger.info(f"📊 Found {len(citations_list)} citations from state (in dict)")
+        
+        # If citations list is still empty, try to get from proposal
         if not citations_list:
             proposal = final_state.get("proposal", {})
             if isinstance(proposal, dict):
-                citations_list = proposal.get("citations", [])
+                proposal_citations = proposal.get("citations", [])
+                if proposal_citations:
+                    citations_list = proposal_citations
+                    logger.info(f"📊 Found {len(citations_list)} citations from proposal")
         
+        # If citations list is still empty, try to get from citation_freq_map
+        if not citations_list:
+            citation_freq_map = final_state.get("citation_freq_map", {})
+            if citation_freq_map:
+                # Get top 3 URLs from the frequency map
+                sorted_citations = sorted(
+                    citation_freq_map.items(), 
+                    key=lambda x: x[1], 
+                    reverse=True
+                )
+                top_urls = [url for url, freq in sorted_citations[:3]]
+                
+                citations_list = [
+                    {
+                        "filepath": f"Document_{i+1}",
+                        "url": url
+                    }
+                    for i, url in enumerate(top_urls)
+                ]
+                logger.info(f"📊 Found {len(citations_list)} citations from citation_freq_map")
+        
+        # Log the citations
+        if citations_list:
+            logger.info(f"📊 Extracted {len(citations_list)} citations:")
+            for i, citation in enumerate(citations_list, 1):
+                if isinstance(citation, dict):
+                    url = citation.get("url", citation.get("filepath", "N/A"))
+                    logger.info(f"  {i}. {url}")
+        else:
+            logger.info("ℹ️ No citations found in state")
+
+        # Format citations for response
         formatted_citations = {
-            "citations": [
-                {
-                    "filepath": c.get("filepath", c.get("name", f"Proposal_{i+1}")),
-                    "url": c.get("url", c.get("link", ""))
-                }
-                for i, c in enumerate(citations_list) if isinstance(c, dict)
-            ]
+            "citations": citations_list
         }
 
         # =========================================================================
         # SECTION 4: Get Document from State (No File Operations)
         # =========================================================================
-        # Get document from state (in-memory)
         document = None
         proposal = final_state.get("proposal", {})
         if isinstance(proposal, dict):
@@ -147,7 +193,6 @@ def generate_proposal_langgraph(questionnaire: str, user_prompt: str = ""):
             # If document exists but proposal_text is empty, try to extract text
             if document and not proposal_text:
                 try:
-                    # Try to extract text from document object
                     if hasattr(document, 'paragraphs'):
                         doc_text = "\n".join([p.text for p in document.paragraphs if p.text.strip()])
                         if doc_text:
@@ -157,14 +202,20 @@ def generate_proposal_langgraph(questionnaire: str, user_prompt: str = ""):
                     logger.warning(f"Could not extract text from document: {e}")
 
         # =========================================================================
-        # SECTION 5: Return in Production Format (No File Dependencies)
+        # SECTION 5: Add Citation Frequency Map to Response (for debugging)
+        # =========================================================================
+        citation_freq_map = final_state.get("citation_freq_map", {})
+        
+        # =========================================================================
+        # SECTION 6: Return in Production Format (No File Dependencies)
         # =========================================================================
         return {
             "success": True,
             "proposal_text": proposal_text,
-            "sections": sections,  # ✅ Now contains all 8 sections in production format
+            "sections": sections,
             "citations": formatted_citations,
-            "document": document,  # Return the document object if available
+            "citation_freq_map": citation_freq_map,  # Include for debugging
+            "document": document,
             "filename": f"proposal_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx",
             "final_state": final_state
         }
@@ -183,6 +234,7 @@ def generate_proposal_langgraph(questionnaire: str, user_prompt: str = ""):
                 for i in range(8)
             ],
             "citations": {"citations": []},
+            "citation_freq_map": {},
             "document": None,
             "filename": None,
             "final_state": {}
@@ -214,7 +266,21 @@ if __name__ == "__main__":
         print(f"Sections: {len(result.get('sections', []))}")
         for section in result.get('sections', []):
             print(f"  - {section.get('prompt')}: {section.get('response', '')[:50]}...")
-        print(f"Citations: {len(result.get('citations', {}).get('citations', []))}")
+        
+        # Print citations
+        citations = result.get('citations', {}).get('citations', [])
+        print(f"Citations: {len(citations)}")
+        for i, citation in enumerate(citations, 1):
+            if isinstance(citation, dict):
+                print(f"  {i}. URL: {citation.get('url', 'N/A')}")
+        
+        # Print citation frequency map
+        freq_map = result.get('citation_freq_map', {})
+        if freq_map:
+            print(f"Citation Frequency Map: {len(freq_map)} entries")
+            for url, freq in list(freq_map.items())[:3]:
+                print(f"  - {url}: {freq} times")
+        
         if result.get('document'):
             print(f"✅ Document object available in memory")
     else:
