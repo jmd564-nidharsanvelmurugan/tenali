@@ -218,10 +218,6 @@ def generate_deliverables_node(state: GraphState) -> GraphState:
     Focuses on tangible outputs, artifacts, and deliverables.
     """
     
-    print("\n" + "=" * 60)
-    print("📝 GENERATING: Deliverables Section (via Azure AI Agent)")
-    print("=" * 60)
-    
     section_name = "Deliverables"
     
     # =====================================================
@@ -232,19 +228,15 @@ def generate_deliverables_node(state: GraphState) -> GraphState:
     # Add all previous sections if available
     if state.get("business_context") and state["business_context"].get("content"):
         previous_sections["Business Context"] = state["business_context"]["content"]
-        print(f"📖 Loaded Business Context for reference")
     
     if state.get("overview") and state["overview"].get("content"):
         previous_sections["Overview"] = state["overview"]["content"]
-        print(f"📖 Loaded Overview for reference")
     
     if state.get("understanding") and state["understanding"].get("content"):
         previous_sections["Understanding"] = state["understanding"]["content"]
-        print(f"📖 Loaded Understanding for reference")
     
     if state.get("objectives") and state["objectives"].get("content"):
         previous_sections["Objectives"] = state["objectives"]["content"]
-        print(f"📖 Loaded Objectives for reference")
     
     # =====================================================
     # STEP 2: Generate content using Azure AI Agent
@@ -255,11 +247,6 @@ def generate_deliverables_node(state: GraphState) -> GraphState:
             metadata=state["metadata_dict"],
             previous_sections=previous_sections if previous_sections else None
         )
-        
-        # Debug print to see full content
-        print("$" * 1000)
-        print(content)
-        print("$" * 1000)
         
         # =====================================================
         # STEP 3: Merge citation frequencies into the global map
@@ -281,19 +268,9 @@ def generate_deliverables_node(state: GraphState) -> GraphState:
             "citations_freq": freq_blob_urls
         }
         
-        print("\n" + "=" * 60)
-        print("✅ Deliverables Generated")
-        print("=" * 60)
-        print(f"📝 Content length: {len(content)} characters")
-        print(f"📊 Citations found in this section: {len(freq_blob_urls)} unique documents")
-        print(f"📊 Total unique citations so far: {len(state['citation_freq_map'])}")
-        print(content[:200] + "..." if len(content) > 200 else content)
-        print(f"\n💾 Stored in memory (state)")
-        
         state["sections_completed"].append(section_name)
         
     except Exception as e:
-        print(f"❌ Error generating Deliverables: {e}")
         import traceback
         traceback.print_exc()
         

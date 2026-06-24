@@ -12,9 +12,6 @@ def generate_business_context_node(state: GraphState) -> GraphState:
     Generate Business Context section using Azure AI Agent.
     The agent automatically retrieves relevant data from AI Search.
     """
-    print("\n" + "=" * 60)
-    print("📝 GENERATING: Business Context Section (via Azure AI Agent)")
-    print("=" * 60)
     
     questionnaire_text = state.get("questionnaire_text", "")
     
@@ -80,15 +77,7 @@ Format the response in well-structured markdown.
         # Get response from Azure AI Agent - now returns (content, freq_blob_urls)
         content, freq_blob_urls = get_agent_response(prompt, system_prompt)
         
-        # Additional cleanup for any remaining citations (backup)
-        content = re.sub(r'【[^】]*】', '', content)
-        content = re.sub(r'\[[0-9,\s]+\]', '', content)
-        content = re.sub(r'\(source[^)]*\)', '', content)
-        content = re.sub(r'\s+', ' ', content).strip()
         
-        print("$"*1000)
-        print(content)
-        print("$"*1000)
         
         # =====================================================
         # Merge citation frequencies into the global map
@@ -112,13 +101,7 @@ Format the response in well-structured markdown.
         
         state["sections_completed"].append("Business Context")
         
-        print(f"✅ Business Context Generated ({len(content)} characters)")
-        print(f"📊 Citations found in this section: {len(freq_blob_urls)} unique documents")
-        print(f"📊 Total unique citations so far: {len(state['citation_freq_map'])}")
-        print(content[:200] + "..." if len(content) > 200 else content)
-        
     except Exception as e:
-        print(f"❌ Error generating Business Context: {e}")
         import traceback
         traceback.print_exc()
         

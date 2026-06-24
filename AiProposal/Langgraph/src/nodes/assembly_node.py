@@ -66,7 +66,6 @@ def generate_proposal_summary(state: GraphState) -> Dict[str, Any]:
         "section_metrics": section_metrics,
         "metadata": state.get("metadata_dict", {})
     }
-    print(f"📊 Proposal summary generated")
     return summary
 
 # =====================================================
@@ -559,10 +558,6 @@ def _build_content_section(doc, client_name="Client", version="v1.0"):
 # Main LangGraph Node
 # =====================================================
 def assemble_proposal_node(state: GraphState) -> GraphState:
-    print("\n" + "=" * 80)
-    print("📄 ASSEMBLING: Complete Proposal")
-    print("=" * 80)
-
     questionnaire = state.get("questionnaire", {})
     client_name = get_client_name(questionnaire)
     version = state.get("version", "v1.0")
@@ -591,16 +586,12 @@ def assemble_proposal_node(state: GraphState) -> GraphState:
 
         heading_counter = [0]
         for section_key, section_title in section_order:
-            print(f"\n📄 Processing: {section_title}")
             section_data = state.get(section_key)
             if not section_data or not isinstance(section_data, dict):
-                print(f"   ⚠️ No data for {section_title}, skipping...")
                 continue
             content = section_data.get("content", "")
             if not content:
-                print(f"   ⚠️ Empty content for {section_title}, skipping...")
                 continue
-            print(f"   ✅ Adding content: {len(content)} characters")
             _apply_styled_content(doc, content, heading_counter)
             _pink_divider(doc)
 
@@ -617,15 +608,7 @@ def assemble_proposal_node(state: GraphState) -> GraphState:
             "timestamp": datetime.now().isoformat()
         }
 
-        print("\n" + "=" * 80)
-        print("✅ PROPOSAL ASSEMBLY COMPLETE!")
-        print("=" * 80)
-        print(f"📄 Proposal document generated in memory")
-        print(f"📊 Summary generated")
-        print("=" * 80)
-
     except Exception as e:
-        print(f"❌ Error during assembly: {e}")
         import traceback
         traceback.print_exc()
         state["error"] = f"Assembly failed: {str(e)}"

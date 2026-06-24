@@ -18,18 +18,6 @@ def generate_proposal_langgraph(questionnaire: str, user_prompt: str = ""):
         dict: Contains proposal_text, sections, and citations matching the production format
     """
     try:
-        logger.info("=" * 80)
-        logger.info("PROPOSAL GENERATION STARTED")
-        logger.info("=" * 80)
-
-        logger.info("QUESTIONNAIRE:")
-        logger.info(questionnaire[:500] + "..." if len(questionnaire) > 500 else questionnaire)
-
-        logger.info("-" * 80)
-
-        logger.info("USER PROMPT:")
-        logger.info(user_prompt)
-
         # Prepare the questionnaire data
         questionnaire_data = {
             "questionnaire": questionnaire,
@@ -39,10 +27,6 @@ def generate_proposal_langgraph(questionnaire: str, user_prompt: str = ""):
         # Run the proposal generation
         final_state = run_proposal_generation(questionnaire_data)
 
-        logger.info("=" * 80)
-        logger.info("PROPOSAL GENERATION COMPLETE")
-        logger.info("=" * 80)
-
         # =========================================================================
         # SECTION 1: Extract Sections from final_state
         # =========================================================================
@@ -50,7 +34,6 @@ def generate_proposal_langgraph(questionnaire: str, user_prompt: str = ""):
         
         # If sections is empty, try to build from individual section data
         if not sections:
-            logger.warning("No sections found in final_state, building from individual sections...")
             section_mapping = [
                 ("business_context", "BusinessContext"),
                 ("overview", "Understanding"),
@@ -76,8 +59,6 @@ def generate_proposal_langgraph(questionnaire: str, user_prompt: str = ""):
                     "response": content,
                     "error": error
                 })
-
-        logger.info(f"📋 Extracted {len(sections)} sections from final_state")
 
         # =========================================================================
         # SECTION 2: Build Combined Proposal Text
@@ -123,15 +104,12 @@ def generate_proposal_langgraph(questionnaire: str, user_prompt: str = ""):
                     }
                     for i, url in enumerate(citations)
                 ]
-                logger.info(f"📊 Found {len(citations_list)} citations from state (as URLs)")
             # If citations is a list of dicts
             elif citations and isinstance(citations[0], dict):
                 citations_list = citations
-                logger.info(f"📊 Found {len(citations_list)} citations from state (as dicts)")
         elif isinstance(citations, dict):
             # If citations is a dict with a 'citations' key
             citations_list = citations.get("citations", [])
-            logger.info(f"📊 Found {len(citations_list)} citations from state (in dict)")
         
         # If citations list is still empty, try to get from proposal
         if not citations_list:
@@ -140,7 +118,6 @@ def generate_proposal_langgraph(questionnaire: str, user_prompt: str = ""):
                 proposal_citations = proposal.get("citations", [])
                 if proposal_citations:
                     citations_list = proposal_citations
-                    logger.info(f"📊 Found {len(citations_list)} citations from proposal")
         
         # If citations list is still empty, try to get from citation_freq_map
         if not citations_list:
@@ -161,17 +138,6 @@ def generate_proposal_langgraph(questionnaire: str, user_prompt: str = ""):
                     }
                     for i, url in enumerate(top_urls)
                 ]
-                logger.info(f"📊 Found {len(citations_list)} citations from citation_freq_map")
-        
-        # Log the citations
-        if citations_list:
-            logger.info(f"📊 Extracted {len(citations_list)} citations:")
-            for i, citation in enumerate(citations_list, 1):
-                if isinstance(citation, dict):
-                    url = citation.get("url", citation.get("filepath", "N/A"))
-                    logger.info(f"  {i}. {url}")
-        else:
-            logger.info("ℹ️ No citations found in state")
 
         # Format citations for response
         formatted_citations = {
@@ -185,10 +151,6 @@ def generate_proposal_langgraph(questionnaire: str, user_prompt: str = ""):
         proposal = final_state.get("proposal", {})
         if isinstance(proposal, dict):
             document = proposal.get("document")
-            if document:
-                logger.info("✅ Document found in state (in-memory)")
-            else:
-                logger.info("ℹ️ No document found in state")
             
             # If document exists but proposal_text is empty, try to extract text
             if document and not proposal_text:
@@ -197,9 +159,8 @@ def generate_proposal_langgraph(questionnaire: str, user_prompt: str = ""):
                         doc_text = "\n".join([p.text for p in document.paragraphs if p.text.strip()])
                         if doc_text:
                             proposal_text = doc_text
-                            logger.info("📄 Extracted text from document object")
-                except Exception as e:
-                    logger.warning(f"Could not extract text from document: {e}")
+                except Exception:
+                    pass
 
         # =========================================================================
         # SECTION 5: Add Citation Frequency Map to Response (for debugging)
@@ -214,14 +175,13 @@ def generate_proposal_langgraph(questionnaire: str, user_prompt: str = ""):
             "proposal_text": proposal_text,
             "sections": sections,
             "citations": formatted_citations,
-            "citation_freq_map": citation_freq_map,  # Include for debugging
+            "citation_freq_map": citation_freq_map,
             "document": document,
             "filename": f"proposal_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx",
             "final_state": final_state
         }
 
     except Exception as e:
-        logger.error(f"Error generating proposal: {str(e)}")
         import traceback
         traceback.print_exc()
         

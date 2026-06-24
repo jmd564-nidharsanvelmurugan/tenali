@@ -213,10 +213,6 @@ def generate_business_impact_node(state: GraphState) -> GraphState:
     This is the FINAL node that extracts the top 3 citations.
     """
     
-    print("\n" + "=" * 60)
-    print("📝 GENERATING: Business Impact Section (via Azure AI Agent)")
-    print("=" * 60)
-    
     section_name = "Business Impact"
     
     # =====================================================
@@ -227,9 +223,6 @@ def generate_business_impact_node(state: GraphState) -> GraphState:
     # Add Outcomes if available
     if state.get("outcomes") and state["outcomes"].get("content"):
         previous_sections["Outcomes"] = state["outcomes"]["content"]
-        print(f"📖 Loaded Outcomes for reference")
-    else:
-        print(f"ℹ️ No Outcomes section available for reference")
     
     # =====================================================
     # STEP 2: Generate content using Azure AI Agent
@@ -240,11 +233,6 @@ def generate_business_impact_node(state: GraphState) -> GraphState:
             metadata=state["metadata_dict"],
             previous_sections=previous_sections if previous_sections else None
         )
-        
-        # Debug print to see full content
-        print("$" * 1000)
-        print(content)
-        print("$" * 1000)
         
         # =====================================================
         # STEP 3: Merge citation frequencies into the global map
@@ -261,16 +249,6 @@ def generate_business_impact_node(state: GraphState) -> GraphState:
         top_urls = get_top_citation_urls(state["citation_freq_map"], top_n=3)
         state["citations"] = top_urls  # List of strings (URLs)
         
-        print("\n" + "=" * 60)
-        print("📊 TOP 3 CITATION URLs (Global):")
-        print("=" * 60)
-        if top_urls:
-            for i, url in enumerate(top_urls, 1):
-                print(f"{i}. {url}")
-        else:
-            print("No citations found")
-        print("=" * 60)
-        
         # =====================================================
         # STEP 5: Store in state
         # =====================================================
@@ -283,19 +261,9 @@ def generate_business_impact_node(state: GraphState) -> GraphState:
             "citations_freq": freq_blob_urls
         }
         
-        print("\n" + "=" * 60)
-        print("✅ Business Impact Generated")
-        print("=" * 60)
-        print(f"📝 Content length: {len(content)} characters")
-        print(f"📊 Citations found in this section: {len(freq_blob_urls)} unique documents")
-        print(f"📊 Total unique citations across all sections: {len(state['citation_freq_map'])}")
-        print(f"📊 Top 3 citations stored in state['citations']")
-        print(f"\n💾 Stored in memory (state)")
-        
         state["sections_completed"].append(section_name)
         
     except Exception as e:
-        print(f"❌ Error generating Business Impact: {e}")
         import traceback
         traceback.print_exc()
         

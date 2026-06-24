@@ -244,10 +244,6 @@ def generate_approach_node(state: GraphState) -> GraphState:
     Focuses on methodology, phases, activities, and timeline.
     """
     
-    print("\n" + "=" * 60)
-    print("📝 GENERATING: Approach Section (via Azure AI Agent)")
-    print("=" * 60)
-    
     section_name = "Approach"
     
     # =====================================================
@@ -258,12 +254,10 @@ def generate_approach_node(state: GraphState) -> GraphState:
     # Add Objectives if available
     if state.get("objectives") and state["objectives"].get("content"):
         previous_sections["Objectives"] = state["objectives"]["content"]
-        print(f"📖 Loaded Objectives for reference")
     
     # Add Deliverables if available
     if state.get("deliverables") and state["deliverables"].get("content"):
         previous_sections["Deliverables"] = state["deliverables"]["content"]
-        print(f"📖 Loaded Deliverables for reference")
     
     # =====================================================
     # STEP 2: Generate content using Azure AI Agent
@@ -274,11 +268,6 @@ def generate_approach_node(state: GraphState) -> GraphState:
             metadata=state["metadata_dict"],
             previous_sections=previous_sections if previous_sections else None
         )
-        
-        # Debug print to see full content
-        print("$" * 1000)
-        print(content)
-        print("$" * 1000)
         
         # =====================================================
         # STEP 3: Merge citation frequencies into the global map
@@ -300,19 +289,9 @@ def generate_approach_node(state: GraphState) -> GraphState:
             "citations_freq": freq_blob_urls
         }
         
-        print("\n" + "=" * 60)
-        print("✅ Approach Generated")
-        print("=" * 60)
-        print(f"📝 Content length: {len(content)} characters")
-        print(f"📊 Citations found in this section: {len(freq_blob_urls)} unique documents")
-        print(f"📊 Total unique citations so far: {len(state['citation_freq_map'])}")
-        print(content[:200] + "..." if len(content) > 200 else content)
-        print(f"\n💾 Stored in memory (state)")
-        
         state["sections_completed"].append(section_name)
         
     except Exception as e:
-        print(f"❌ Error generating Approach: {e}")
         import traceback
         traceback.print_exc()
         

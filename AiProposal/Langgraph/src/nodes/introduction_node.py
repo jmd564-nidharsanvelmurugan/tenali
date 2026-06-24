@@ -4,9 +4,6 @@ from ..state import GraphState
 
 def generate_introduction_node(state: GraphState) -> GraphState:
     """Generate the Introduction to JMAN section."""
-    print("\n" + "=" * 80)
-    print("📝 GENERATING: Introduction to JMAN")
-    print("=" * 80)
     
     # Add a heading (# Introduction to JMAN) for consistency
     introduction_content = """# Introduction to JMAN
@@ -22,8 +19,5 @@ JMAN is a Data & Analytics Consultancy with 325 employees across London, Chennai
     }
     
     state["sections_completed"].append("Introduction to JMAN")
-    
-    print(f"✅ Introduction to JMAN generated ({len(introduction_content)} characters)")
-    print("=" * 80)
     
     return state

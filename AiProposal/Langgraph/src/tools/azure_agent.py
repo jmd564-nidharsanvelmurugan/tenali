@@ -84,7 +84,6 @@ class AzureAgentClient:
             
             # Parse KB documents and build frequency map
             freq_blob_urls = {}
-            print("\n=== KB DOCUMENTS USED ===")
             
             for item in response.output:
                 if getattr(item, "name", "") == "knowledge_base_retrieve":
@@ -100,25 +99,15 @@ class AzureAgentClient:
                             blob_url = data.get("blob_url")
                             if blob_url:
                                 freq_blob_urls[blob_url] = freq_blob_urls.get(blob_url, 0) + 1
-                        except Exception as e:
-                            print(f"Error parsing document: {e}")
+                        except Exception:
                             pass
-            
-            # Print frequency of BLOB URLs
-            print("\n=== FREQUENCY OF BLOB URLs ===")
-            for url, freq in freq_blob_urls.items():
-                print(f"{url}: {freq}")
             
             # Clean citations from response
             cleaned_text = response.output_text
             
-            print("\n=== CLEANED RESPONSE PREVIEW ===")
-            print(cleaned_text[:500] + "..." if len(cleaned_text) > 500 else cleaned_text)
-            
             return cleaned_text, freq_blob_urls
             
         except Exception as e:
-            print(f"❌ Error calling Azure AI Agent: {e}")
             return f"Error: {str(e)}", {}
 
 

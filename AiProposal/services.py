@@ -136,7 +136,6 @@ async def fetch_chat_completion(prompt: str, system_prompt: str, docs_prompt: st
             }]
         }
     except Exception as e:
-        print(f"Azure OpenAI error: {e}")
         raise HTTPException(status_code=500, detail=f"AI generation failed: {str(e)}")
 
 
@@ -184,8 +183,7 @@ def get_proposal_content(proposals: list[ScoredProposals]) -> list[str]:
             doc = Document(io.BytesIO(blob_bytes))
             text = get_all_text_from_doc(doc)
             combined_content.append(text)
-        except Exception as e:
-            print(f"Warning: Could not load proposal template {p.proposal.name}: {e}")
+        except Exception:
             combined_content.append(f"Template content for {p.proposal.name} not available")
     return combined_content
 
@@ -277,12 +275,6 @@ async def generate_proposal(conversation_id: UUID, db: Session, uid: UUID, user_
         questionnaire=questionnaire_for_agent,
         user_prompt=user_prompt or "",
     )
-    
-
-    print("@"*1000)
-    print(ggg_output.get("citations", {}).get("citations", []))
-    print("@"*1000)
-
 
     # Extract data from ggg_output
     proposal_text = ggg_output.get("proposal_text", "")
@@ -337,8 +329,8 @@ async def generate_proposal(conversation_id: UUID, db: Session, uid: UUID, user_
     # Upload proposal to blob storage
     try:
         proposal_docx_upload(proposal_text, current_user.email, conversation_id)
-    except Exception as e:
-        print(f"Warning: Could not upload to blob storage: {e}")
+    except Exception:
+        pass
 
     # Format sections for frontend
     formatted_sections = []
@@ -825,10 +817,8 @@ def proposal_docx(conversation_id: UUID, db: Session):
                     json_str = json_str[start:end].strip()
                 
                 data = json.loads(json_str)
-                print(f"✅ Successfully extracted {len(data)} phases from Approach content")
                 return data
-            except json.JSONDecodeError as e:
-                print(f"❌ Failed to parse Gantt data: {e}")
+            except json.JSONDecodeError:
                 # Return default structure
                 return [
                     {
@@ -865,7 +855,6 @@ def proposal_docx(conversation_id: UUID, db: Session):
         def _add_base64_image_to_doc(doc, base64_string: str, width_cm: float = 15.0):
             """Add an image from a base64 string to the document."""
             if not base64_string:
-                print("   ⚠️ No base64 image data provided")
                 return False
             
             try:
@@ -891,11 +880,9 @@ def proposal_docx(conversation_id: UUID, db: Session):
                 caption.paragraph_format.space_before = Pt(4)
                 caption.paragraph_format.space_after = Pt(12)
                 
-                print(f"   ✅ Added Gantt chart image (width: {width_cm}cm, height: {height_cm:.2f}cm)")
                 return True
                 
-            except Exception as e:
-                print(f"   ❌ Failed to add base64 image: {e}")
+            except Exception:
                 return False
 
         _BOLD_RE = re.compile(r"\*\*(.+?)\*\*")
@@ -1053,7 +1040,6 @@ def proposal_docx(conversation_id: UUID, db: Session):
 
             # After rendering all content, if this is the Approach section, generate and add Gantt chart
             if extract_gantt and approach_content:
-                print("\n   📊 Generating Gantt chart for Approach section...")
                 try:
                     # Generate Gantt data from the approach content
                     gantt_data = _generate_gantt_data(approach_content)
@@ -1065,15 +1051,8 @@ def proposal_docx(conversation_id: UUID, db: Session):
                         if base64_gantt:
                             # Add the image to the document
                             _add_base64_image_to_doc(doc, base64_gantt, width_cm=15.0)
-                            print("   ✅ Gantt chart added to document")
-                        else:
-                            print("   ⚠️ Failed to generate base64 Gantt chart")
-                    else:
-                        print("   ⚠️ No Gantt data generated")
-                except Exception as e:
-                    print(f"   ❌ Error generating Gantt chart: {e}")
-                    import traceback
-                    traceback.print_exc()
+                except Exception:
+                    pass
 
         def _build_cover_section(doc, client_name: str):
             sec = doc.sections[0]
@@ -1299,8 +1278,8 @@ def proposal_docx_upload(proposal_content: str, user_email: str, conversation_id
             blob=blob_path
         )
         generated_blob_client.upload_blob(doc_stream, overwrite=True)
-    except Exception as e:
-        print(f"Warning: Could not upload proposal to blob storage: {e}")
+    except Exception:
+        pass
 
     try:
         indexer_url = f'https://{AZURE_SEARCH_SERVICE}.search.windows.net/indexers/{AZURE_SEARCH_SERVICE_INDEXER_GENERATED_PROPOSALS_NAME}/run?api-version=2020-06-30'
@@ -1311,7 +1290,6 @@ def proposal_docx_upload(proposal_content: str, user_email: str, conversation_id
         indexer_status_url = f'https://{AZURE_SEARCH_SERVICE}.search.windows.net/indexers/{AZURE_SEARCH_SERVICE_INDEXER_GENERATED_PROPOSALS_NAME}/status?api-version=2020-06-30'
         max_retries = 10
         wait_time = 5
-        last_run_status = "Unknown"
 
         for _ in range(max_retries):
             status_response = requests.get(indexer_status_url, headers=hdrs)
@@ -1377,7 +1355,6 @@ async def upload_file_to_azure_blob(file: bytes, blob_path: str):
         blob_client = container_client.get_blob_client(f"ai-proposals/{blob_path}")
         await blob_client.upload_blob(file, overwrite=True)
     except Exception as e:
-        print(f"Warning: Could not upload file to blob storage: {e}")
         raise HTTPException(status_code=400, detail=f"File upload failed: {str(e)}")
 
 
@@ -1432,5 +1409,4 @@ Whole proposal:
         }
         
     except Exception as e:
-        print(f"Azure OpenAI error: {e}")
         raise HTTPException(status_code=500, detail=f"AI generation failed: {str(e)}")

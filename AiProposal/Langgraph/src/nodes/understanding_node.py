@@ -193,10 +193,6 @@ def generate_understanding_node(state: GraphState) -> GraphState:
     Focuses on business problems, pain points, and requirements.
     """
     
-    print("\n" + "=" * 60)
-    print("📝 GENERATING: Understanding Section (via Azure AI Agent)")
-    print("=" * 60)
-    
     section_name = "Understanding"
     
     # =====================================================
@@ -207,12 +203,10 @@ def generate_understanding_node(state: GraphState) -> GraphState:
     # Add Business Context if available
     if state.get("business_context") and state["business_context"].get("content"):
         previous_sections["Business Context"] = state["business_context"]["content"]
-        print(f"📖 Loaded Business Context for reference")
     
     # Add Overview if available
     if state.get("overview") and state["overview"].get("content"):
         previous_sections["Overview"] = state["overview"]["content"]
-        print(f"📖 Loaded Overview for reference")
     
     # =====================================================
     # STEP 2: Generate content using Azure AI Agent
@@ -223,11 +217,6 @@ def generate_understanding_node(state: GraphState) -> GraphState:
             metadata=state["metadata_dict"],
             previous_sections=previous_sections if previous_sections else None
         )
-        
-        # Debug print to see full content
-        print("$" * 1000)
-        print(content)
-        print("$" * 1000)
         
         # =====================================================
         # STEP 3: Merge citation frequencies into the global map
@@ -249,19 +238,9 @@ def generate_understanding_node(state: GraphState) -> GraphState:
             "citations_freq": freq_blob_urls
         }
         
-        print("\n" + "=" * 60)
-        print("✅ Understanding Generated")
-        print("=" * 60)
-        print(f"📝 Content length: {len(content)} characters")
-        print(f"📊 Citations found in this section: {len(freq_blob_urls)} unique documents")
-        print(f"📊 Total unique citations so far: {len(state['citation_freq_map'])}")
-        print(content[:200] + "..." if len(content) > 200 else content)
-        print(f"\n💾 Stored in memory (state)")
-        
         state["sections_completed"].append(section_name)
         
     except Exception as e:
-        print(f"❌ Error generating Understanding: {e}")
         import traceback
         traceback.print_exc()
         
