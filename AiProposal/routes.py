@@ -101,8 +101,6 @@ async def create_message_endpoint(
     current_user: User =Depends(get_current_user)
 ):
     try:
-        print("Hit in Router")
-        print(request.user_prompt)
         res = await generate_proposal_controller(request.conversation_id, db, current_user.id , request.user_prompt)
         return res
     except ValueError as e:

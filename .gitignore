@@ -35,6 +35,8 @@ venv/
 .venv/
 env/
 .env/
+new_venv/
+.new_venv/
 
 # IDE
 .vscode/

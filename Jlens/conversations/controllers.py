@@ -35,11 +35,6 @@ def list_messages_by_conversation_controller(
     from db.models import Conversation
     from Jlens.workspace.services import check_workspace_access
     
-    print("@" * 100)
-    print(f"Listing messages for conversation_id: {conversation_id} and user_id: {user_id}")
-    print("@" * 100)
-
-
     conversation = db.query(Conversation).filter(
         Conversation.id == conversation_id
     ).first()
