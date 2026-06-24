@@ -1,6 +1,4 @@
 import logging
-import os
-import glob
 from datetime import datetime
 from .src.graph import run_proposal_generation
 
@@ -126,7 +124,7 @@ def generate_proposal_langgraph(questionnaire: str, user_prompt: str = ""):
         formatted_citations = {
             "citations": [
                 {
-                    "filepath": c.get("filepath", c.get("name", f"Proposal_{i+1}.docx")),
+                    "filepath": c.get("filepath", c.get("name", f"Proposal_{i+1}")),
                     "url": c.get("url", c.get("link", ""))
                 }
                 for i, c in enumerate(citations_list) if isinstance(c, dict)
@@ -134,43 +132,40 @@ def generate_proposal_langgraph(questionnaire: str, user_prompt: str = ""):
         }
 
         # =========================================================================
-        # SECTION 4: Find Generated DOCX File
+        # SECTION 4: Get Document from State (No File Operations)
         # =========================================================================
-        docx_files = glob.glob("./x_results/Proposal*.docx")
-        if not docx_files:
-            docx_files = glob.glob("./x_results/*.docx")
-        
-        if not docx_files:
-            proposal = final_state.get("proposal", {})
-            word_path = proposal.get("word_path")
-            if word_path and os.path.exists(word_path):
-                docx_files = [word_path]
-        
-        latest_docx = None
-        if docx_files:
-            latest_docx = max(docx_files, key=os.path.getctime)
-            logger.info(f"Found DOCX file: {latest_docx}")
+        # Get document from state (in-memory)
+        document = None
+        proposal = final_state.get("proposal", {})
+        if isinstance(proposal, dict):
+            document = proposal.get("document")
+            if document:
+                logger.info("✅ Document found in state (in-memory)")
+            else:
+                logger.info("ℹ️ No document found in state")
             
-            if not proposal_text and latest_docx:
+            # If document exists but proposal_text is empty, try to extract text
+            if document and not proposal_text:
                 try:
-                    from docx import Document
-                    doc = Document(latest_docx)
-                    doc_text = "\n".join([p.text for p in doc.paragraphs if p.text.strip()])
-                    if doc_text:
-                        proposal_text = doc_text
+                    # Try to extract text from document object
+                    if hasattr(document, 'paragraphs'):
+                        doc_text = "\n".join([p.text for p in document.paragraphs if p.text.strip()])
+                        if doc_text:
+                            proposal_text = doc_text
+                            logger.info("📄 Extracted text from document object")
                 except Exception as e:
-                    logger.warning(f"Could not read DOCX content: {e}")
+                    logger.warning(f"Could not extract text from document: {e}")
 
         # =========================================================================
-        # SECTION 5: Return in Production Format
+        # SECTION 5: Return in Production Format (No File Dependencies)
         # =========================================================================
         return {
             "success": True,
             "proposal_text": proposal_text,
             "sections": sections,  # ✅ Now contains all 8 sections in production format
             "citations": formatted_citations,
-            "file_path": latest_docx,
-            "filename": f"proposal_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx" if latest_docx else None,
+            "document": document,  # Return the document object if available
+            "filename": f"proposal_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx",
             "final_state": final_state
         }
 
@@ -188,8 +183,9 @@ def generate_proposal_langgraph(questionnaire: str, user_prompt: str = ""):
                 for i in range(8)
             ],
             "citations": {"citations": []},
-            "file_path": None,
-            "filename": None
+            "document": None,
+            "filename": None,
+            "final_state": {}
         }
 
 
@@ -219,5 +215,7 @@ if __name__ == "__main__":
         for section in result.get('sections', []):
             print(f"  - {section.get('prompt')}: {section.get('response', '')[:50]}...")
         print(f"Citations: {len(result.get('citations', {}).get('citations', []))}")
+        if result.get('document'):
+            print(f"✅ Document object available in memory")
     else:
         print(f"❌ Proposal generation failed: {result.get('error', 'Unknown error')}")

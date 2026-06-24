@@ -1,6 +1,0 @@
-{
-    "section": "Understanding",
-    "timestamp": "20260623_110158",
-    "source": "Azure AI Agent",
-    "content": "# Understanding\n\n- Limited granularity in existing pipeline reporting is restricting visibility into lead progression and conversion.\n- There is an absence of integrated and detailed Customer Acquisition Cost (CAC) insights, inhibiting accurate measurement of marketing effectiveness.\n- Data ingestion from QuickBooks is not yet established and presents an integration requirement for accurate CAC reporting.\n- Assessment and improvement of data quality across key systems are necessary to underpin reliable Lead-to-AUM (L2A) and CAC analytics.\n- An enhanced L2A and CAC data model is required to support new reporting and analytics needs.\n- Automated data ingestion and transformation pipelines are needed to ensure timely and accurate reporting on L2A and CAC metrics.\n- The solution must support distinct user roles, including data and technology stakeholders, senior leadership, and marketing teams.\n- Mandatory integrations with both Salesforce and QuickBooks are essential for the desired reporting capabilities.\n- Engagement timelines and deliverables are dependent on timely access to data and successful integration of QuickBooks."
-}

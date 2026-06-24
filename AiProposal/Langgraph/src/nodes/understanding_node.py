@@ -1,11 +1,9 @@
 # src/nodes/understanding_node.py
 import json
-import os
 from datetime import datetime
 from typing import Optional, Dict, Any
 from ..state import GraphState
 from ..tools.azure_agent import get_agent_response
-from ..tools.filtering import ensure_results_folder, save_to_json
 
 
 # =====================================================
@@ -113,7 +111,7 @@ def generate_understanding_node(state: GraphState) -> GraphState:
     section_name = "Understanding"
     
     # =====================================================
-    # STEP 1: Prepare previous sections (Business Context + Overview)
+    # STEP 1: Prepare previous sections (read from state - memory only)
     # =====================================================
     previous_sections = {}
     
@@ -138,7 +136,7 @@ def generate_understanding_node(state: GraphState) -> GraphState:
         )
         
         # =====================================================
-        # STEP 3: Store in state
+        # STEP 3: Store in state only (no file saving)
         # =====================================================
         state["understanding"] = {
             "content": content,
@@ -148,30 +146,11 @@ def generate_understanding_node(state: GraphState) -> GraphState:
             "document_ids_used": []
         }
         
-        # =====================================================
-        # STEP 4: Save outputs
-        # =====================================================
-        ensure_results_folder()
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        
-        # Save content as Markdown
-        with open(f"x_results/understanding_{timestamp}.md", "w", encoding="utf-8") as f:
-            f.write(content)
-        
-        # Save section metadata
-        section_output = {
-            "section": "Understanding",
-            "timestamp": timestamp,
-            "source": "Azure AI Agent",
-            "content": content
-        }
-        save_to_json(section_output, f"understanding_section_{timestamp}.json")
-        
         print("\n" + "=" * 60)
         print("✅ Understanding Generated")
         print("=" * 60)
         print(content[:200] + "..." if len(content) > 200 else content)
-        print(f"\n💾 Saved to: x_results/understanding_{timestamp}.md")
+        print(f"\n💾 Stored in memory (state)")
         
         state["sections_completed"].append(section_name)
         

@@ -1,6 +1,0 @@
-{
-    "section": "Understanding",
-    "timestamp": "20260622_153622",
-    "source": "Azure AI Agent",
-    "content": "Error: AIProjectClient.__init__() missing 1 required positional argument: 'credential'"
-}

@@ -1,11 +1,9 @@
 # src/nodes/approach_node.py
 import json
-import os
 from datetime import datetime
 from typing import Optional, Dict, Any
 from ..state import GraphState
 from ..tools.azure_agent import get_agent_response
-from ..tools.filtering import ensure_results_folder, save_to_json
 
 
 # =====================================================
@@ -117,7 +115,6 @@ Format the response in well-structured markdown.
     content = get_agent_response(prompt, system_prompt)
     
     return content
-    
 
 
 # =====================================================
@@ -137,7 +134,7 @@ def generate_approach_node(state: GraphState) -> GraphState:
     section_name = "Approach"
     
     # =====================================================
-    # STEP 1: Prepare previous sections (Objectives + Deliverables only)
+    # STEP 1: Prepare previous sections (read from state - memory only)
     # =====================================================
     previous_sections = {}
     
@@ -162,7 +159,7 @@ def generate_approach_node(state: GraphState) -> GraphState:
         )
         
         # =====================================================
-        # STEP 3: Store in state
+        # STEP 3: Store in state only (no file saving)
         # =====================================================
         state["approach"] = {
             "content": content,
@@ -172,28 +169,11 @@ def generate_approach_node(state: GraphState) -> GraphState:
             "document_ids_used": []
         }
         
-        # =====================================================
-        # STEP 4: Save outputs
-        # =====================================================
-        ensure_results_folder()
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        
-        
-        
-        # Save section metadata
-        section_output = {
-            "section": "Approach",
-            "timestamp": timestamp,
-            "source": "Azure AI Agent",
-            "content": content
-        }
-        save_to_json(section_output, f"approach_section_{timestamp}.json")
-        
         print("\n" + "=" * 60)
         print("✅ Approach Generated")
         print("=" * 60)
         print(content[:200] + "..." if len(content) > 200 else content)
-        print(f"\n💾 Saved to: x_results/approach_{timestamp}.md")
+        print(f"\n💾 Stored in memory (state)")
         
         state["sections_completed"].append(section_name)
         

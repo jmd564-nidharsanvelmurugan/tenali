@@ -1,5 +1,0 @@
-# Business Context
-
-The client operates within the professional services sector, delivering due diligence solutions to support informed investment and transaction decisions. As a portfolio company within a private equity environment, the business is focused on strengthening its data-driven capabilities to enhance transparency, performance tracking, and value creation across its operations.  
-
-The current initiative centers on a design and discovery project to define the requirements for a new data platform. With no existing infrastructure in place, the client seeks to establish a scalable foundation that can support pipeline visibility and analytics for its B2C model. The goal is to enable more reliable, timely, and actionable insights that can inform both commercial and operational decision-making, while positioning the business for future growth and transaction readiness.

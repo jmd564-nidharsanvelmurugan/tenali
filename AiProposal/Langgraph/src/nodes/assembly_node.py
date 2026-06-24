@@ -66,10 +66,7 @@ def generate_proposal_summary(state: GraphState) -> Dict[str, Any]:
         "section_metrics": section_metrics,
         "metadata": state.get("metadata_dict", {})
     }
-    summary_path = "x_results/proposal_summary.json"
-    with open(summary_path, "w", encoding="utf-8") as f:
-        json.dump(summary, f, indent=2)
-    print(f"📊 Proposal summary saved to: {summary_path}")
+    print(f"📊 Proposal summary generated")
     return summary
 
 # =====================================================
@@ -90,7 +87,7 @@ _GREEN   = RGBColor(0x2E, 0x7D, 0x32)
 _FONT = "Arial"
 
 # =====================================================
-# Brand asset locations
+# Brand asset locations (READ ONLY - local assets)
 # =====================================================
 _ASSETS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "jman")
 _ASSET_FILES = {
@@ -464,13 +461,6 @@ def _build_cover_section(doc, client_name: str):
     _run(p_jman, "JMAN Group", 30, bold=True, color=_NAVY)
 
 # =====================================================
-# Back cover (no longer used – kept only for reference)
-# =====================================================
-# def _build_back_cover_section(doc):
-#     sec = doc.add_section(WD_SECTION.NEW_PAGE)
-#     ...
-
-# =====================================================
 # Helper to insert a PAGE field
 # =====================================================
 def _add_page_number_field(paragraph, size_pt=8, color=_GRAY):
@@ -614,20 +604,15 @@ def assemble_proposal_node(state: GraphState) -> GraphState:
             _apply_styled_content(doc, content, heading_counter)
             _pink_divider(doc)
 
-        # Back cover removed
-
-        # Save
+        # Generate filename for state tracking (but don't save)
         filename = generate_proposal_filename(state)
-        os.makedirs("x_results", exist_ok=True)
-        word_path = f"x_results/{filename}.docx"
-        doc.save(word_path)
-        print(f"\n✅ Word document saved to: {word_path}")
-
+        
+        # Generate summary without saving
         summary = generate_proposal_summary(state)
 
         state["proposal"] = {
             "filename": filename,
-            "word_path": word_path,
+            "document": doc,  # Store the document object in state
             "summary": summary,
             "timestamp": datetime.now().isoformat()
         }
@@ -635,8 +620,8 @@ def assemble_proposal_node(state: GraphState) -> GraphState:
         print("\n" + "=" * 80)
         print("✅ PROPOSAL ASSEMBLY COMPLETE!")
         print("=" * 80)
-        print(f"📄 Word Doc: {word_path}")
-        print(f"📊 Summary: x_results/proposal_summary.json")
+        print(f"📄 Proposal document generated in memory")
+        print(f"📊 Summary generated")
         print("=" * 80)
 
     except Exception as e:

@@ -531,19 +531,6 @@ def add_content_to_doc(doc, content):
         paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.LEFT
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 def proposal_docx(conversation_id: UUID, db: Session):
     """
     Generate a formatted DOCX proposal document from the conversation.
@@ -563,7 +550,7 @@ def proposal_docx(conversation_id: UUID, db: Session):
         from docx.enum.table import WD_TABLE_ALIGNMENT
         from docx.oxml.ns import qn
         from docx.oxml import OxmlElement
-        from typing import Optional, Dict, Any
+        from typing import Optional, Dict, Any, List
         from uuid import UUID
         from sqlalchemy import asc
         from PIL import Image
@@ -589,6 +576,7 @@ def proposal_docx(conversation_id: UUID, db: Session):
         _PAGE_W_CM = 21.0
         _PAGE_H_CM = 29.7
 
+        # Asset directory (local files - kept for reading)
         _ASSETS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "jman")
         _ASSET_FILES = {
             "logo_white":  "jman_logo_white.png",
@@ -1283,9 +1271,6 @@ def proposal_docx(conversation_id: UUID, db: Session):
         raise HTTPException(status_code=400, detail=f"Error generating proposal document: {str(e)}")
 
 
-
-
-
 def proposal_docx_upload(proposal_content: str, user_email: str, conversation_id: UUID):
     """Upload a generated proposal DOCX to blob storage and trigger search indexer"""
     try:
@@ -1403,6 +1388,17 @@ async def edit_proposal_llm_service(conversation_id: UUID, new_message: str, db:
         if not message:
             raise HTTPException(status_code=404, detail="Message not found")
         proposal_msg = message.content
+    else:
+        # Get latest proposal
+        messages = (
+            db.query(Message)
+            .filter(Message.conversation_id == conversation_id, Message.role == "assistant")
+            .order_by(Message.created_at.desc())
+            .first()
+        )
+        if not messages:
+            raise HTTPException(status_code=404, detail="No proposal found")
+        proposal_msg = messages.content
     
     system_prompt = f"""
 User will provide a part of proposal's content along with new instructions to edit it.

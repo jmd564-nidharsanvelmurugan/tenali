@@ -1,7 +1,0 @@
-# Business Context
-
-Poekmon is a U.S.-based financial advisory and wealth management firm that provides individual clients with personalized financial advice and asset management services. Operating in a direct-to-consumer model, the company leverages a modern technology stack including Salesforce, Tamarac, Azure Synapse, Microsoft Fabric, Power BI, and QuickBooks to manage client relationships, portfolios, and financial operations. Key stakeholders include Jason Carver, Client Engagement Manager, and Lee Equity Partners, Poekmon’s investment partner.  
-
-The company aims to strengthen its data-driven decision-making by improving how it tracks the conversion of leads into assets under management (Lead-to-AUM or L2A) and measures the cost of acquiring new customers (Customer Acquisition Cost or CAC). Current reporting lacks the depth and connectivity needed to link marketing activities to business outcomes, limiting visibility into performance and return on investment.  
-
-By developing a unified data model and automated reporting framework, Poekmon seeks to deliver accurate, timely, and actionable insights across its data, technology, and marketing teams. Integrating QuickBooks with existing systems will complete the data picture for CAC analysis, while enhanced Power BI dashboards will provide leadership with clear, consistent metrics to guide growth and optimize marketing spend.

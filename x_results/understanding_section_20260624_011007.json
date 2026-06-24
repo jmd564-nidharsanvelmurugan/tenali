@@ -1,6 +1,0 @@
-{
-    "section": "Understanding",
-    "timestamp": "20260624_011007",
-    "source": "Azure AI Agent",
-    "content": "# Understanding\n\n- The current pipeline reporting lacks the necessary granularity to provide meaningful insights into the customer journey from lead to assets under management (AUM) and marketing effectiveness.\n- Existing customer acquisition cost (CAC) reporting is not fully integrated across all relevant data sources, creating gaps in the measurement of return on marketing spend.\n- Pure Financial Advisors requires a more detailed and unified Lead-to-AUM (L2A) and CAC data model to support strategic business analysis.\n- Integration and ingestion of financial data from QuickBooks is a mandatory requirement, and connecting with Salesforce is also essential.\n- Data quality must be assessed and ensured for effective CAC reporting, as accuracy challenges may impact insights.\n- Automated data ingestion and transformation pipelines are needed to streamline L2A and CAC reporting and reduce manual efforts.\n- Key system users include data and technology stakeholders, senior leadership, and marketing teams, each relying on timely and accurate reporting for decision-making.\n- There are dependencies related to data access, quality, and successful connection to QuickBooks and Salesforce for building the required reporting suite."
-}

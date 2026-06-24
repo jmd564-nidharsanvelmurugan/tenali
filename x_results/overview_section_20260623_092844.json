@@ -1,6 +1,0 @@
-{
-    "section": "Overview",
-    "timestamp": "20260623_092844",
-    "source": "Azure AI Agent",
-    "content": "# Overview\n\nVONQ’s current operational landscape involves the Finance, commercial/CRM, data/analytics, and senior leadership teams, all of which are actively engaged in exit preparation and investor reporting activities. These teams leverage a range of integrated systems, including the Finance System, CRM, ERP, and Qlik Warehouse, which serves as the primary data and reporting platform.\n\nExisting reporting is primarily delivered through Qlik-based dashboards, supported by datasets drawn from the Finance System, CRM, ERP, and additional Excel-based files. Legacy data sources are also engaged, as required, to provide a minimum of three years of trended business data. The Qlik Warehouse, deployed as the principal cloud platform, underpins both current and historic data reporting, though direct and automated integrations from all source systems are not yet fully established.\n\nIntegration across these platforms is partly manual; select systems lack automated connections into the Qlik Warehouse and therefore require manual, one-off data ingestion. In cases where recurring data updates are necessary during the transaction period, a defined refresh process is implemented."
-}

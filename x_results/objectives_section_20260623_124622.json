@@ -1,6 +1,0 @@
-{
-    "section": "Objectives",
-    "timestamp": "20260623_124622",
-    "source": "Azure AI Agent",
-    "content": "# Objectives\n\n- Achieve a fully designed exit reporting suite that enables VONQ to support investor communications and the M&A sale process.\n- Automate refreshable data ingestion pipelines from Finance, CRM, ERP, and legacy sources to ensure timely, recurring data updates for transaction reporting.\n- Provide senior leadership with investor-grade visibility into business metrics via an equity narrative-aligned KPI framework and dashboards.\n- Enhance user experience through intuitive dashboards that clearly define KPIs, calculation logic, and navigation structure linked to the equity narrative.\n- Standardize exit reporting processes and strengthen data infrastructure readiness for rigorous investor scrutiny.\n- Establish a scalable conceptual data model and reporting suite that is extensible to additional data sources and supports ongoing refresh beyond the transaction.\n- Integrate core source systems—Finance System, CRM, ERP, and Qlik Warehouse—within the platform, with consideration for future tooling options and automation."
-}

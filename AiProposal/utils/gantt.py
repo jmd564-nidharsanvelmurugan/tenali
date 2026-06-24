@@ -8,7 +8,7 @@ from io import BytesIO
 # ==========================================
 # Main function to create hierarchical Gantt chart
 # ==========================================
-def create_hierarchical_gantt(data, output_file=None, return_base64=True):
+def create_hierarchical_gantt(data, return_base64=True):
     """
     Create a hierarchical Gantt chart from nested phase/task data.
     
@@ -16,14 +16,12 @@ def create_hierarchical_gantt(data, output_file=None, return_base64=True):
     -----------
     data : list
         Nested list of phase dictionaries, each containing tasks
-    output_file : str, optional
-        Output filename for PNG image (if None, no file is saved)
     return_base64 : bool
         If True, returns base64 encoded string of the PNG image
     
     Returns:
     --------
-    plotly.graph_objects.Figure or str
+    str or plotly.graph_objects.Figure
         If return_base64 is True, returns base64 encoded string
         Otherwise returns the figure object
     """
@@ -251,19 +249,10 @@ def create_hierarchical_gantt(data, output_file=None, return_base64=True):
     )
 
     # ==========================================
-    # Save PNG or return base64
+    # Return base64 or figure (No file operations)
     # ==========================================
-    if output_file:
-        fig.write_image(
-            output_file,
-            width=2000,
-            height=1200,
-            scale=2,
-        )
-        print(f"Saved: {output_file}")
-    
     if return_base64:
-        # Convert to base64
+        # Convert to base64 (in-memory only)
         img_bytes = fig.to_image(format="png", width=2000, height=1200, scale=2)
         base64_str = base64.b64encode(img_bytes).decode('utf-8')
         return base64_str
@@ -382,7 +371,7 @@ if __name__ == "__main__":
         }
     ]
 
-    # Call the function to get base64 encoded image
+    # Call the function to get base64 encoded image (in-memory only)
     base64_image = create_hierarchical_gantt(
         data=data,
         return_base64=True
@@ -390,10 +379,5 @@ if __name__ == "__main__":
     
     # Print the base64 string (this can be used in HTML img tags, APIs, etc.)
     print("Base64 Encoded Image:")
-    print(base64_image)
-    
-    # Optionally, you can also save the file if needed
-    # create_hierarchical_gantt(data=data, output_file="chart.png", return_base64=False)
-    
-    # Or get both the base64 and save the file
-    # base64_image = create_hierarchical_gantt(data=data, output_file="chart.png", return_base64=True)
+    print(base64_image[:100] + "..." if len(base64_image) > 100 else base64_image)
+    print(f"\n✅ Image generated successfully! (Base64 length: {len(base64_image)} characters)")

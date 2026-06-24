@@ -1,6 +1,0 @@
-{
-    "section": "Objectives",
-    "timestamp": "20260621_004607",
-    "source": "Azure AI Agent",
-    "content": "Error: 400 - {\n  \"error\": {\n    \"message\": \"Missing required parameter: 'model'.\",\n    \"type\": \"invalid_request_error\",\n    \"param\": \"model\",\n    \"code\": \"missing_required_parameter\"\n  }\n}"
-}
